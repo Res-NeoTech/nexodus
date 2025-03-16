@@ -1,0 +1,71 @@
+/* Color Theme Swatches in Hex */
+$promptBox: #0e0e0e;
+$hacker-blue-2-hex: #093040;
+$hacker-blue-3-hex: #0E5259;
+$hacker-blue-4-hex: #147373;
+$hacker-blue-5-hex: #21A698;
+
+main{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.greeting{
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    position: relative;
+    top: 250px;
+
+    img{
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 150px;
+    }
+
+    h5{
+        text-align: center;
+        color: $hacker-blue-5-hex;
+    }
+}
+
+.messageBox{
+    width: 50%;
+    border-radius: 10px;
+    display: flex;
+    background-color: $promptBox;
+    height: 100px;
+    position: fixed;
+    bottom: 25px;
+
+    textarea{
+        width: 90%;
+        height: 100%;
+        resize: none;
+        padding: 10px;
+
+        &:focus{
+            outline: none;
+        }
+
+        &::placeholder {
+            color: $hacker-blue-4-hex;
+        }
+    }
+
+    button{
+        width: 10%;
+        height: 100%;
+        color: #21A698;
+        transition: all 0.3s;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+
+        &:hover{
+            background-color: $hacker-blue-3-hex;
+            color: #0e0e0e;
+            transition: all 0.3s;
+        }
+    }
+}
