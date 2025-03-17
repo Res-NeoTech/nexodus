@@ -1,5 +1,5 @@
 /* Color Theme Swatches in Hex */
-$promptBox: #0e0e0e;
+$promptBox: #202020;
 $hacker-blue-2-hex: #093040;
 $hacker-blue-3-hex: #0E5259;
 $hacker-blue-4-hex: #147373;
@@ -9,6 +9,31 @@ main{
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+#chat{
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.userMessage{
+    text-align: left;
+    width: 100%;
+    margin-top: 25px;
+
+    h3{
+        color: $hacker-blue-5-hex;
+    }
+
+    div{
+        background-color: black;
+        border: 1px $promptBox solid;
+        padding: 10px;
+        border-radius: 10px;
+        border-left: $hacker-blue-3-hex 10px solid;
+    }
 }
 
 .greeting{
