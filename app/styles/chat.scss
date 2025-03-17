@@ -16,9 +16,10 @@ main{
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height: 50vh;
 }
 
-.userMessage{
+.userMessage, .aiMessage{
     text-align: left;
     width: 100%;
     margin-top: 25px;
@@ -33,6 +34,16 @@ main{
         padding: 10px;
         border-radius: 10px;
         border-left: $hacker-blue-3-hex 10px solid;
+    }
+}
+
+.aiMessage{
+    h3{
+        color: $hacker-blue-3-hex;
+    }
+
+    div{
+        border-left: $hacker-blue-2-hex 10px solid;
     }
 }
 
@@ -61,8 +72,9 @@ main{
     display: flex;
     background-color: $promptBox;
     height: 100px;
-    position: fixed;
-    bottom: 25px;
+    position: sticky;
+    margin-top: 100px;
+    bottom: 50px;
 
     textarea{
         width: 90%;

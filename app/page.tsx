@@ -4,6 +4,7 @@ import Image from "next/image";
 import ReactDOM from "react-dom/client";
 
 import UserMessageBox from "./components/userMessage";
+import AiMessageBox from "./components/aiMessage";
 
 import "./styles/chat.scss";
 import nexodusImage from "../public/nexodus.png";
@@ -13,6 +14,7 @@ function Home() {
   const greetingRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isFirstMessage, setIsFirstMessage] = useState<boolean>(true);
+  const [messages, setMessages] = useState<{ role: string; content: string; }[] | null>(null);
 
   const sendMessage = async () => {
     const prompt: string | undefined = textareaRef.current?.value;
@@ -36,13 +38,17 @@ function Home() {
   }
 
   const callMistralAPI = async (prompt: string): Promise<string | null> => {
-    const API_KEY: string = "KEY HERE";
-    const API_URL: string = "https://api.mistral.ai/v1/chat/completions";
+    const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
+    const API_URL = "https://api.mistral.ai/v1/chat/completions";
+
+    // Добавляем новое сообщение пользователя
+    const updatedMessages = [...(messages || []), { role: "user", content: prompt }];
+    setMessages(updatedMessages);
 
     const body = JSON.stringify({
       model: "mistral-small-latest",
       stream: false,
-      messages: [{ role: "user", content: prompt }]
+      messages: updatedMessages
     });
 
     try {
@@ -61,11 +67,19 @@ function Home() {
       }
 
       const data = await response.json();
-      const userMessageElement = document.createElement('section');
-      userMessageElement.className = 'userMessage';
-      const root = ReactDOM.createRoot(userMessageElement);
-      root.render(<UserMessageBox message={data.choices[0].message.content} />);
-      chatRef.current?.appendChild(userMessageElement);
+      const aiResponse = data.choices[0].message.content;
+
+      // Добавляем ответ ИИ в историю
+      const newHistory = [...updatedMessages, { role: "assistant", content: aiResponse }];
+      setMessages(newHistory);
+
+      // Отображаем ответ
+      const aiMessageElement = document.createElement('section');
+      aiMessageElement.className = 'aiMessage';
+      const root = ReactDOM.createRoot(aiMessageElement);
+      root.render(<AiMessageBox message={aiResponse} />);
+      chatRef.current?.appendChild(aiMessageElement);
+
       return null;
     } catch (err) {
       console.error("Erreur de requête:", err);
