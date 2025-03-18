@@ -2,6 +2,7 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import ReactDOM from "react-dom/client";
+import anime from "animejs";
 
 import UserMessageBox from "./components/userMessage";
 import AiMessageBox from "./components/aiMessage";
@@ -15,6 +16,7 @@ function Home() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isFirstMessage, setIsFirstMessage] = useState<boolean>(true);
   const [messages, setMessages] = useState<{ role: string; content: string; }[] | null>(null);
+  const [messageCount, setMessageCount] = useState<Number>(0);
 
   const sendMessage = async () => {
     const prompt: string | undefined = textareaRef.current?.value;
@@ -30,9 +32,18 @@ function Home() {
       }
       const userMessageElement = document.createElement('section');
       userMessageElement.className = 'userMessage';
+      userMessageElement.classList.add("userAnim-" + messageCount);
       const root = ReactDOM.createRoot(userMessageElement);
       root.render(<UserMessageBox message={prompt} />);
       chatRef.current?.appendChild(userMessageElement);
+      anime({
+        targets: ".userAnim-" + messageCount,
+        opacity: [0, 1],
+        scale: [0.5, 1],
+        duration: 800,
+        easing: "easeOutExpo"
+      });
+      setMessageCount(Number(messageCount) + 1);
       callMistralAPI(prompt);
     }
   }
