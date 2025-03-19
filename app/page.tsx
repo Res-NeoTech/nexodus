@@ -25,6 +25,9 @@ function Home() {
       if (isFirstMessage) {
         setIsFirstMessage(false);
         greetingRef.current?.remove();
+        if (chatRef.current) {
+          chatRef.current.style.marginBottom = "0px";
+        }
       }
 
       if (textareaRef.current) {
@@ -39,11 +42,10 @@ function Home() {
       anime({
         targets: ".userAnim-" + messageCount,
         opacity: [0, 1],
-        scale: [0.5, 1],
-        duration: 800,
+        translateY: ["-50%", "0%"],
+        duration: 1000,
         easing: "easeOutExpo"
       });
-      setMessageCount(Number(messageCount) + 1);
       callMistralAPI(prompt);
     }
   }
@@ -87,9 +89,18 @@ function Home() {
       // Отображаем ответ
       const aiMessageElement = document.createElement('section');
       aiMessageElement.className = 'aiMessage';
+      aiMessageElement.classList.add("aiAnim-" + messageCount);
       const root = ReactDOM.createRoot(aiMessageElement);
       root.render(<AiMessageBox message={aiResponse} />);
       chatRef.current?.appendChild(aiMessageElement);
+      anime({
+        targets: ".aiAnim-" + messageCount,
+        opacity: [0, 1],
+        translateY: ["-50%", "0%"],
+        duration: 1000,
+        easing: "easeOutExpo"
+      });
+      setMessageCount(Number(messageCount) + 1);
 
       return null;
     } catch (err) {

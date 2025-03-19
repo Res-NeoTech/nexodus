@@ -17,12 +17,15 @@ main{
     flex-direction: column;
     align-items: center;
     min-height: 50vh;
+    margin-bottom: 100px;   
 }
 
 .userMessage, .aiMessage{
     text-align: left;
     width: 100%;
     margin-top: 25px;
+    opacity: 0;
+    transform: translateY(-50%);
 
     h3{
         color: $hacker-blue-5-hex;
@@ -57,7 +60,6 @@ main{
     img{
         margin-left: auto;
         margin-right: auto;
-        margin-bottom: 150px;
     }
 
     h5{

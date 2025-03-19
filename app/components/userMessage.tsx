@@ -1,9 +1,12 @@
+import React from "react";
+import ReactMarkdown from 'react-markdown';
+
 const UserMessageBox = ({ message }: { message: string }) => {
     return (
         <>
             <h3>You</h3>
             <div>
-                <p>{message}</p>
+                <ReactMarkdown>{message}</ReactMarkdown>
             </div>
         </>
     );
