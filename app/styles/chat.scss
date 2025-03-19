@@ -41,12 +41,21 @@ main{
 }
 
 .aiMessage{
+    word-wrap: break-word;
     h3{
         color: $hacker-blue-3-hex;
     }
 
     div{
         border-left: $hacker-blue-2-hex 10px solid;
+    }
+
+    code{
+        background-color: #333333;
+        padding: 5px;
+        border-radius: 10px;
+        width: 100%;
+        word-wrap: break-word;
     }
 }
 
@@ -55,7 +64,7 @@ main{
     flex-direction: column;
     width: 50%;
     position: relative;
-    top: 250px;
+    top: 75px;
 
     img{
         margin-left: auto;

@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<img src="public/nexodus.png" alt="Nexodus Logo" width="300" height="300">
 
-## Getting Started
+Nexodus is a React and Next.js-powered AI chat application that leverages the Mistral AI API. This project is front-end oriented and focuses on providing a seamless chatting experience with features like chat history and Markdown processing.
 
-First, run the development server:
+## Features
 
+- **Chatting**: Real-time conversation with AI.
+- **History**: View and manage chat history(not completely implemented yet).
+- **Markdown Processing**: Support for Markdown formatting in chat messages.
+
+## Technologies
+
+- **React**: A JavaScript library for building user interfaces.
+- **TypeScript**: A typed superset of JavaScript that compiles to plain JavaScript.
+- **Next.js**: A React framework for building server-side rendered and statically exported applications.
+- **Mistral API**: AI-powered chat functionality.
+
+## Installation
+
+1. **Clone the repository**:
+```bash
+git clone https://github.com/yourusername/nexodus.git
+cd nexodus
+```
+2. **Install dependencies**:
+```bash
+npm install
+```
+3. **Run the project in development mode**:
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+4. **Build the project for production**:
+```bash
+npm run build
+```
+5. **Usage**
+To use Nexodus, simply run the development server using npm run dev and open your browser to http://localhost:3000. You can start chatting with the AI and explore the features like chat history and Markdown processing.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Contributing
+Contributions are welcome! Please follow these steps to contribute:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Fork the repository.
+Create a new branch (git checkout -b feature/your-feature).
+Make your changes and commit them (git commit -am 'Add your feature').
+Push to the branch (git push origin feature/your-feature).
+Create a new Pull Request.
+License
+This project is licensed under the MIT License. See the LICENSE file for more details.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Contact
+For any questions or suggestions, please contact me at [my website](https://maksym.ch/contact).
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Demo
+Check out the live demo of Nexodus: https://nexodus.maksym.ch
