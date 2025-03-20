@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.5.0",
     "animejs": "^3.2.2",
     "next": "15.2.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^15.6.1",
     "sass": "^1.85.1"
   },
   "devDependencies": {

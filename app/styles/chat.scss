@@ -5,79 +5,116 @@ $hacker-blue-3-hex: #0E5259;
 $hacker-blue-4-hex: #147373;
 $hacker-blue-5-hex: #21A698;
 
-main{
+main {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-#chat{
+#chat {
     width: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 50vh;
-    margin-bottom: 100px;   
+    margin-bottom: 100px;
 }
 
-.userMessage, .aiMessage{
+.userMessage,
+.aiMessage {
     text-align: left;
     width: 100%;
     margin-top: 25px;
     opacity: 0;
     transform: translateY(-50%);
 
-    h3{
+    h1 {
         color: $hacker-blue-5-hex;
     }
 
-    div{
-        background-color: black;
-        border: 1px $promptBox solid;
-        padding: 10px;
-        border-radius: 10px;
-        border-left: $hacker-blue-3-hex 10px solid;
+    h2 {
+        color: $hacker-blue-4-hex;
     }
-}
 
-.aiMessage{
-    word-wrap: break-word;
-    h3{
+    h3 {
         color: $hacker-blue-3-hex;
     }
 
-    div{
-        border-left: $hacker-blue-2-hex 10px solid;
+    h4 {
+        color: $hacker-blue-2-hex;
     }
 
-    code{
-        background-color: #333333;
-        padding: 5px;
+    div {
+        background-color: black;
+        border: 1px $promptBox solid;
+        padding: 15px;
         border-radius: 10px;
+        border-left: $hacker-blue-3-hex 10px solid;
+    }
+
+    pre {
         width: 100%;
         word-wrap: break-word;
     }
+
+    section {
+        overflow-x: scroll;
+    }
+
+    strong {
+        color: $hacker-blue-5-hex;
+    }
+
+    p {
+        strong {
+            color: $hacker-blue-4-hex;
+        }
+    }
 }
 
-.greeting{
+.aiMessage {
+    word-wrap: break-word;
+
+    h1 {
+        color: $hacker-blue-2-hex;
+    }
+
+    h2 {
+        color: $hacker-blue-3-hex;
+    }
+
+    h3 {
+        color: $hacker-blue-4-hex;
+    }
+
+    h4 {
+        color: $hacker-blue-5-hex;
+    }
+
+    div {
+        border-left: $hacker-blue-2-hex 10px solid;
+    }
+}
+
+.greeting {
     display: flex;
     flex-direction: column;
     width: 50%;
     position: relative;
     top: 75px;
 
-    img{
+    img {
         margin-left: auto;
         margin-right: auto;
     }
 
-    h5{
+    h5 {
         text-align: center;
         color: $hacker-blue-5-hex;
     }
 }
 
-.messageBox{
+.messageBox {
     width: 50%;
     border-radius: 10px;
     display: flex;
@@ -87,13 +124,13 @@ main{
     margin-top: 100px;
     bottom: 50px;
 
-    textarea{
+    textarea {
         width: 90%;
         height: 100%;
         resize: none;
         padding: 10px;
 
-        &:focus{
+        &:focus {
             outline: none;
         }
 
@@ -102,7 +139,7 @@ main{
         }
     }
 
-    button{
+    button {
         width: 10%;
         height: 100%;
         color: #21A698;
@@ -110,10 +147,20 @@ main{
         border-top-right-radius: 10px;
         border-bottom-right-radius: 10px;
 
-        &:hover{
+        &:hover {
             background-color: $hacker-blue-3-hex;
             color: #0e0e0e;
             transition: all 0.3s;
         }
+    }
+}
+
+@media (max-width: 768px) {
+    #chat{
+        width: 95%;
+    }
+
+    .messageBox{
+        width: 95%;
     }
 }

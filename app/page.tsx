@@ -17,10 +17,11 @@ function Home() {
   const [isFirstMessage, setIsFirstMessage] = useState<boolean>(true);
   const [messages, setMessages] = useState<{ role: string; content: string; }[] | null>(null);
   const [messageCount, setMessageCount] = useState<Number>(0);
+  const [isCurrentlyGenerating, setIsCurrentlyGenerating] = useState<boolean>(false);
 
   const sendMessage = async () => {
     const prompt: string | undefined = textareaRef.current?.value;
-    if (prompt) {
+    if (prompt && !isCurrentlyGenerating) {
 
       if (isFirstMessage) {
         setIsFirstMessage(false);
@@ -46,22 +47,32 @@ function Home() {
         duration: 1000,
         easing: "easeOutExpo"
       });
+      setIsCurrentlyGenerating(true);
       callMistralAPI(prompt);
     }
   }
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && event.shiftKey) {
+
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      sendMessage();
+    }
+  };
 
   const callMistralAPI = async (prompt: string): Promise<string | null> => {
     const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
     const API_URL = "https://api.mistral.ai/v1/chat/completions";
 
-    // Добавляем новое сообщение пользователя
+    // On ajoute le message utilisateur à l'historique
     const updatedMessages = [...(messages || []), { role: "user", content: prompt }];
     setMessages(updatedMessages);
 
     const body = JSON.stringify({
       model: "mistral-small-latest",
-      stream: false,
-      messages: updatedMessages
+      stream: true,
+      messages: updatedMessages,
     });
 
     try {
@@ -74,24 +85,20 @@ function Home() {
         body: body
       });
 
-      if (!response.ok) {
+      if (!response.ok || !response.body) {
         console.error("Erreur API:", await response.text());
         return null;
       }
 
-      const data = await response.json();
-      const aiResponse = data.choices[0].message.content;
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let aiResponse = "";
 
-      // Добавляем ответ ИИ в историю
-      const newHistory = [...updatedMessages, { role: "assistant", content: aiResponse }];
-      setMessages(newHistory);
-
-      // Отображаем ответ
-      const aiMessageElement = document.createElement('section');
-      aiMessageElement.className = 'aiMessage';
+      // Création de l'élément pour afficher la réponse de l'assistant
+      const aiMessageElement = document.createElement("section");
+      aiMessageElement.className = "aiMessage";
       aiMessageElement.classList.add("aiAnim-" + messageCount);
       const root = ReactDOM.createRoot(aiMessageElement);
-      root.render(<AiMessageBox message={aiResponse} />);
       chatRef.current?.appendChild(aiMessageElement);
       anime({
         targets: ".aiAnim-" + messageCount,
@@ -100,14 +107,61 @@ function Home() {
         duration: 1000,
         easing: "easeOutExpo"
       });
-      setMessageCount(Number(messageCount) + 1);
 
+      let assistantPlaceholderAdded = false;
+
+      const updateMessage = (newText: string, toolCalls?: any) => {
+        if (toolCalls) {
+          if (!assistantPlaceholderAdded) {
+            updatedMessages.push({ role: "assistant", content: "" });
+            assistantPlaceholderAdded = true;
+          }
+          root.render(<AiMessageBox message={""} />);
+        } else {
+          aiResponse += newText;
+          root.render(<AiMessageBox message={aiResponse} />);
+        }
+      };
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+
+        const lines = chunk.split("\n").filter(line => line.trim() !== "");
+        for (const line of lines) {
+          if (!line.startsWith("data:")) continue;
+          const jsonStr = line.replace("data:", "").trim();
+          try {
+            const parsed = JSON.parse(jsonStr);
+
+            const delta = parsed.choices?.[0]?.delta;
+            if (!delta) continue;
+
+            if (delta.tool_calls) {
+              updateMessage("", delta.tool_calls);
+            } else if (delta.content) {
+              updateMessage(delta.content);
+            }
+          } catch (error) {
+            console.warn("Erreur de parsing JSON:", error, "Chunk:", jsonStr);
+          }
+        }
+      }
+
+      if (!assistantPlaceholderAdded) {
+        updatedMessages.push({ role: "assistant", content: aiResponse });
+      }
+      setMessages([...updatedMessages]);
+      setMessageCount(Number(messageCount) + 1);
+      setIsCurrentlyGenerating(false);
       return null;
     } catch (err) {
       console.error("Erreur de requête:", err);
       return null;
     }
   };
+
 
   return (
     <>
@@ -123,7 +177,7 @@ function Home() {
           </div>
         </article>
         <article className="messageBox">
-          <textarea name="promptArea" id="promptArea" placeholder="Type a prompt..." ref={textareaRef}></textarea>
+          <textarea name="promptArea" id="promptArea" onKeyDown={handleKeyDown} placeholder="Type a prompt..." ref={textareaRef}></textarea>
           <button onClick={sendMessage}>Send</button>
         </article>
       </main>
