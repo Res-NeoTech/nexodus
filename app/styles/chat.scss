@@ -1,5 +1,5 @@
 /* Color Theme Swatches in Hex */
-$promptBox: #202020;
+$promptBox: #131313;
 $hacker-blue-2-hex: #093040;
 $hacker-blue-3-hex: #0E5259;
 $hacker-blue-4-hex: #147373;
@@ -45,29 +45,33 @@ main {
     }
 
     div {
-        background-color: black;
+        background-color: rgba(0, 0, 0, 0.548);
         border: 1px $promptBox solid;
         padding: 15px;
         border-radius: 10px;
         border-left: $hacker-blue-3-hex 10px solid;
-    }
+        box-shadow: rgba(167, 167, 167, 0.1) 0px 0px 20px 0px;
+        backdrop-filter: blur(10px);
 
-    pre {
-        width: 100%;
-        word-wrap: break-word;
-    }
-
-    section {
-        overflow-x: scroll;
-    }
-
-    strong {
-        color: $hacker-blue-5-hex;
-    }
-
-    p {
+        pre {
+            width: 100%;
+        }
+    
+        section {
+            overflow-x: scroll;
+            background-color: $promptBox !important;
+            backdrop-filter: blur(10px);
+        }
+    
         strong {
-            color: $hacker-blue-4-hex;
+            color: $hacker-blue-5-hex;
+        }
+    
+        p {
+            strong {
+                color: $hacker-blue-4-hex;
+                font-weight: 700;
+            }
         }
     }
 }
@@ -123,6 +127,7 @@ main {
     position: sticky;
     margin-top: 100px;
     bottom: 50px;
+    box-shadow: rgba(167, 167, 167, 0.1) 0px 0px 20px 0px;
 
     textarea {
         width: 90%;
@@ -155,7 +160,17 @@ main {
     }
 }
 
-@media (max-width: 768px) {
+@media (min-width: 993px) AND (max-width: 1200px) {
+    #chat{
+        width: 75%;
+    }
+
+    .messageBox{
+        width: 75%;
+    }
+}
+
+@media (max-width: 992px) {
     #chat{
         width: 95%;
     }
