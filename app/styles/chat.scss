@@ -44,6 +44,11 @@ main {
         color: $hacker-blue-2-hex;
     }
 
+    a{
+        text-decoration: underline;
+        color: $hacker-blue-4-hex;
+    }
+
     div {
         background-color: rgba(0, 0, 0, 0.548);
         border: 1px $promptBox solid;
@@ -175,7 +180,20 @@ main {
         width: 95%;
     }
 
-    .messageBox{
-        width: 95%;
+    .messageBox {
+        width: 100%;
+        bottom: 0;
+        position: sticky;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+        margin-top: 50px;
+
+        textarea {
+            width: 80%;
+        }
+
+        button {
+            width: 20%;
+        }
     }
 }

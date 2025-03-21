@@ -1,4 +1,4 @@
-<img src="public/nexodus.png" alt="Nexodus Logo" width="300" height="300">
+<img src="public/nexodus.png" alt="Nexodus Logo" width="400" height="400">
 
 Nexodus is a React and Next.js-powered AI chat application that leverages the Mistral AI API. This project is front-end oriented and focuses on providing a seamless chatting experience with features like chat history and Markdown processing.
 
@@ -7,6 +7,7 @@ Nexodus is a React and Next.js-powered AI chat application that leverages the Mi
 - **Chatting**: Real-time conversation with AI.
 - **History**: View and manage chat history(not completely implemented yet).
 - **Markdown Processing**: Support for Markdown formatting in chat messages.
+- **Code highlighting**: Detects and highlights almost any programming language syntax.
 
 ## Technologies
 
@@ -19,7 +20,7 @@ Nexodus is a React and Next.js-powered AI chat application that leverages the Mi
 
 1. **Clone the repository**:
 ```bash
-git clone https://github.com/yourusername/nexodus.git
+git clone https://github.com/Res-NeoTech/nexodus.git
 cd nexodus
 ```
 2. **Install dependencies**:
