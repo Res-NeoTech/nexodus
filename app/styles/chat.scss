@@ -44,11 +44,6 @@ main {
         color: $hacker-blue-2-hex;
     }
 
-    a{
-        text-decoration: underline;
-        color: $hacker-blue-4-hex;
-    }
-
     div {
         background-color: rgba(0, 0, 0, 0.548);
         border: 1px $promptBox solid;
@@ -60,6 +55,11 @@ main {
 
         pre {
             width: 100%;
+        }
+
+        a{
+            text-decoration: underline;
+            color: $hacker-blue-4-hex;
         }
     
         section {
@@ -194,6 +194,7 @@ main {
 
         button {
             width: 20%;
+            border-bottom-right-radius: 0;
         }
     }
 }
