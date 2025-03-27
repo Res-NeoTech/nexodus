@@ -23,7 +23,7 @@ function Home() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const sendMessage = async () => {
-    const prompt: string | undefined = textareaRef.current?.value;
+    const prompt: string | undefined = textareaRef.current?.value.trim();
     if (prompt && !isCurrentlyGenerating) {
 
       if (isFirstMessage) {
@@ -32,6 +32,10 @@ function Home() {
         if (chatRef.current) {
           chatRef.current.style.marginBottom = "0px";
         }
+      }
+
+      if (sendButtonRef.current) {
+        sendButtonRef.current.textContent = "Stop";
       }
 
       if (textareaRef.current) {
@@ -67,9 +71,6 @@ function Home() {
       console.log(messages);
     } else {
       sendMessage();
-      if (sendButtonRef.current) {
-        sendButtonRef.current.textContent = "Stop";
-      }
     }
   }
 
