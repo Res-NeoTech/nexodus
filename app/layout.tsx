@@ -16,7 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Nexodus",
   description: "Nexodus - a free AI chat using Mistral.",
-  icons: "/favicon.png"
+  icons: {
+    icon: "/favicon.png?v=1",
+  },
 };
 
 export default function RootLayout({
