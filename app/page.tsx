@@ -23,10 +23,10 @@ function Home() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const sendMessage = async () => {
-      setStopGenerate(false); // Reset stopGenerate to false at the start
-      setMessageCount((prev) => Number(prev) + 1); // Increment messageCount for new animations
-      const prompt: string | undefined = textareaRef.current?.value.trim();
-      if (prompt && !isCurrentlyGenerating) {
+    setStopGenerate(false); // Reset stopGenerate to false at the start
+    setMessageCount((prev) => Number(prev) + 1); // Increment messageCount for new animations
+    const prompt: string | undefined = textareaRef.current?.value.trim();
+    if (prompt && !isCurrentlyGenerating) {
 
       if (isFirstMessage) {
         setIsFirstMessage(false);
@@ -63,7 +63,7 @@ function Home() {
 
   const handleButton = () => {
     if (isCurrentlyGenerating) {
-      setStopGenerate(true); //Delete if doesn't works correctly.
+      //setStopGenerate(true); //Delete if doesn't works correctly.
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
@@ -89,19 +89,19 @@ function Home() {
   const callMistralAPI = async (prompt: string): Promise<string | null> => {
     const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
     const API_URL = "https://api.mistral.ai/v1/chat/completions";
-  
+
     const updatedMessages = [...(messages || []), { role: "user", content: prompt }];
     setMessages(updatedMessages);
-  
+
     const body = JSON.stringify({
       model: "mistral-small-latest",
       stream: true,
       messages: updatedMessages,
     });
-  
+
     const controller = new AbortController();
     abortControllerRef.current = controller;
-  
+
     try {
       const response = await fetch(API_URL, {
         method: "POST",
@@ -112,16 +112,16 @@ function Home() {
         body: body,
         signal: controller.signal
       });
-  
+
       if (!response.ok || !response.body) {
         console.error("Erreur API:", await response.text());
         return null;
       }
-  
+
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let aiResponse = "";
-  
+
       // Création de l'élément pour afficher la réponse de l'assistant
       const aiMessageElement = document.createElement("section");
       aiMessageElement.className = "aiMessage";
@@ -135,23 +135,23 @@ function Home() {
         duration: 1000,
         easing: "easeOutExpo"
       });
-  
+
       let assistantPlaceholderAdded = false;
-  
+
       const updateMessage = (newText: string) => {
         aiResponse += newText;
         root.render(<AiMessageBox message={aiResponse} />);
-      
+
         if (!assistantPlaceholderAdded) {
           updatedMessages.push({ role: "assistant", content: aiResponse });
           assistantPlaceholderAdded = true;
         } else {
           updatedMessages[updatedMessages.length - 1].content = aiResponse;
         }
-      
+
         setMessages([...updatedMessages]); // Mise à jour du state
       };
-  
+
       while (true) {
         const { value, done } = await reader.read();
         if (stopGenerate) {
@@ -159,7 +159,7 @@ function Home() {
           break;
         }
         if (done) break;
-  
+
         const chunk = decoder.decode(value, { stream: true });
         const lines = chunk.split("\n").filter(line => line.trim() !== "");
         for (const line of lines) {
@@ -169,7 +169,7 @@ function Home() {
             const parsed = JSON.parse(jsonStr);
             const delta = parsed.choices?.[0]?.delta;
             if (!delta) continue;
-  
+
             if (delta.content) {
               updateMessage(delta.content);
             }
@@ -178,17 +178,20 @@ function Home() {
           }
         }
       }
-  
+
       setMessages([...updatedMessages]);
       setMessageCount((prev) => Number(prev) + 1);
       setIsCurrentlyGenerating(false);
+      if (sendButtonRef.current) {
+        sendButtonRef.current.textContent = "Send";
+      }
       return null;
     } catch (err) {
       console.error("Request error: ", err);
       setIsCurrentlyGenerating(false);
       return null;
     }
-  };  
+  };
 
   return (
     <>
