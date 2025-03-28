@@ -23,8 +23,10 @@ function Home() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const sendMessage = async () => {
-    const prompt: string | undefined = textareaRef.current?.value.trim();
-    if (prompt && !isCurrentlyGenerating) {
+      setStopGenerate(false); // Reset stopGenerate to false at the start
+      setMessageCount((prev) => Number(prev) + 1); // Increment messageCount for new animations
+      const prompt: string | undefined = textareaRef.current?.value.trim();
+      if (prompt && !isCurrentlyGenerating) {
 
       if (isFirstMessage) {
         setIsFirstMessage(false);
@@ -68,6 +70,7 @@ function Home() {
       if (sendButtonRef.current) {
         sendButtonRef.current.textContent = "Send";
       }
+      anime.remove(".aiAnim-" + messageCount); // Reset animation for the current message
       console.log(messages);
     } else {
       sendMessage();
