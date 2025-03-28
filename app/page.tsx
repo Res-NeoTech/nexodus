@@ -63,7 +63,7 @@ function Home() {
 
   const handleButton = () => {
     if (isCurrentlyGenerating) {
-      setStopGenerate(true);
+      setStopGenerate(true); //Delete if doesn't works correctly.
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
