@@ -57,25 +57,31 @@ main {
             width: 100%;
         }
 
-        a{
+        a {
             text-decoration: underline;
             color: $hacker-blue-4-hex;
         }
-    
+
         section {
             overflow-x: scroll;
             background-color: $promptBox !important;
             backdrop-filter: blur(10px);
         }
-    
+
         strong {
             color: $hacker-blue-5-hex;
         }
-    
+
+        hr {
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+
         p {
             strong {
                 color: $hacker-blue-4-hex;
                 font-weight: 700;
+                font-size: 1.2rem;
             }
         }
     }
@@ -85,7 +91,13 @@ main {
     word-wrap: break-word;
 
     h1 {
-        color: $hacker-blue-2-hex;
+        color: $hacker-blue-5-hex;
+    }
+
+    div {
+        h1 {
+            color: $hacker-blue-2-hex;
+        }
     }
 
     h2 {
@@ -98,10 +110,6 @@ main {
 
     h4 {
         color: $hacker-blue-5-hex;
-    }
-
-    div {
-        border-left: $hacker-blue-2-hex 10px solid;
     }
 }
 
@@ -166,17 +174,17 @@ main {
 }
 
 @media (min-width: 993px) AND (max-width: 1200px) {
-    #chat{
+    #chat {
         width: 75%;
     }
 
-    .messageBox{
+    .messageBox {
         width: 75%;
     }
 }
 
 @media (max-width: 992px) {
-    #chat{
+    #chat {
         width: 95%;
     }
 
@@ -196,5 +204,78 @@ main {
             width: 20%;
             border-bottom-right-radius: 0;
         }
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    $promptBox: #f9f9f9;
+    $hacker-blue-2-hex: #b8d1de;
+    $hacker-blue-3-hex: #8fbccf;
+    $hacker-blue-4-hex: #6697b9;
+    $hacker-blue-5-hex: #3d82aa;
+
+    .userMessage,
+    .aiMessage {
+        h1 {
+            color: $hacker-blue-5-hex;
+        }
+
+        h2 {
+            color: $hacker-blue-4-hex;
+        }
+
+        h3 {
+            color: $hacker-blue-3-hex;
+        }
+
+        h4 {
+            color: $hacker-blue-2-hex;
+        }
+
+        div {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px $promptBox solid;
+            border-left: $hacker-blue-3-hex 10px solid;
+
+            a {
+                color: $hacker-blue-4-hex;
+            }
+
+            strong {
+                color: $hacker-blue-5-hex;
+            }
+
+            section {
+                background-color: $promptBox !important;
+            }
+
+            p {
+                strong {
+                    color: $hacker-blue-4-hex;
+                }
+            }
+        }
+    }
+
+    .messageBox {
+        background-color: $promptBox;
+        box-shadow: none;
+
+        textarea::placeholder {
+            color: $hacker-blue-4-hex;
+        }
+
+        button {
+            color: $hacker-blue-5-hex;
+
+            &:hover {
+                background-color: $hacker-blue-3-hex;
+                color: #fff;
+            }
+        }
+    }
+
+    .greeting h5 {
+        color: $hacker-blue-5-hex;
     }
 }

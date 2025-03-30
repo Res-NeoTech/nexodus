@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import ReactDOM from "react-dom/client";
 import anime from "animejs";
@@ -17,10 +17,32 @@ function Home() {
   const sendButtonRef = useRef<HTMLButtonElement>(null);
   const [isFirstMessage, setIsFirstMessage] = useState<boolean>(true);
   const [messages, setMessages] = useState<{ role: string; content: string; }[] | null>(null);
-  const [messageCount, setMessageCount] = useState<Number>(0);
+  const [messageCount, setMessageCount] = useState<number>(0);
   const [isCurrentlyGenerating, setIsCurrentlyGenerating] = useState<boolean>(false);
   const [stopGenerate, setStopGenerate] = useState<boolean>(false);
+  const [preferBottom, setPreferBottom] = useState<boolean>(true);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const preferBottomRef = useRef(preferBottom);
+
+  // useEffect here to check if user prefer to be scrolled automatically while AI generates a response.
+  useEffect(() => {
+    const handleScroll = () => {
+      const isAtBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 100);
+  
+      if (preferBottomRef.current !== isAtBottom) {
+        preferBottomRef.current = isAtBottom;
+        setPreferBottom(isAtBottom);
+        //console.log("Updated preferBottom:", isAtBottom);
+      }
+    };
+  
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    preferBottomRef.current = preferBottom;
+  }, [preferBottom]);
 
   const sendMessage = async () => {
     setStopGenerate(false); // Reset stopGenerate to false at the start
@@ -63,7 +85,6 @@ function Home() {
 
   const handleButton = () => {
     if (isCurrentlyGenerating) {
-      //setStopGenerate(true); //Delete if doesn't works correctly.
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
@@ -114,7 +135,7 @@ function Home() {
       });
 
       if (!response.ok || !response.body) {
-        console.error("Erreur API:", await response.text());
+        console.error("API Error:", await response.text());
         return null;
       }
 
@@ -122,7 +143,6 @@ function Home() {
       const decoder = new TextDecoder();
       let aiResponse = "";
 
-      // Création de l'élément pour afficher la réponse de l'assistant
       const aiMessageElement = document.createElement("section");
       aiMessageElement.className = "aiMessage";
       aiMessageElement.classList.add("aiAnim-" + messageCount);
@@ -158,6 +178,9 @@ function Home() {
           setStopGenerate(false);
           break;
         }
+        if (preferBottomRef.current) {
+          window.scrollTo(0, document.documentElement.scrollHeight);
+        }
         if (done) break;
 
         const chunk = decoder.decode(value, { stream: true });
@@ -174,7 +197,7 @@ function Home() {
               updateMessage(delta.content);
             }
           } catch (error) {
-            console.warn("Erreur de parsing JSON:", error, "Chunk:", jsonStr);
+            console.warn("JSON Parse Error:", error, "Chunk:", jsonStr);
           }
         }
       }
