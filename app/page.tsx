@@ -28,14 +28,14 @@ function Home() {
   useEffect(() => {
     const handleScroll = () => {
       const isAtBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 100);
-  
+
       if (preferBottomRef.current !== isAtBottom) {
         preferBottomRef.current = isAtBottom;
         setPreferBottom(isAtBottom);
         //console.log("Updated preferBottom:", isAtBottom);
       }
     };
-  
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -106,24 +106,77 @@ function Home() {
       sendMessage();
     }
   };
+  /**
+   * Function to search Google using the Search API.
+   * @author FauZaPespi
+   * @param query The search query to be sent to the Google Search API.
+   * @returns informations
+   */
+  const searchGoogle = async (query: string) => {
+    const API_KEY = process.env.NEXT_PUBLIC_SEARCH_API_KEY;
+    console.log("searchAPIKey", API_KEY);
+    const API_URL = `https://www.searchapi.io/api/v1/search`;
+
+    if (!API_KEY) {
+      console.error("API Key is missing");
+      return [];
+    }
+
+    try {
+      const response = await fetch(`${API_URL}?engine=google&api_key=${API_KEY}&q=${encodeURIComponent(query)}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("Google Search Results:", data);
+      return data || []; // `results` est la clé correcte selon la documentation
+    } catch (error) {
+      console.error("Error fetching Google search results:", error);
+      return [];
+    }
+  };
+
 
   const callMistralAPI = async (prompt: string): Promise<string | null> => {
     const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
     const API_URL = "https://api.mistral.ai/v1/chat/completions";
 
-    const updatedMessages = [...(messages || []), { role: "user", content: prompt }];
-    setMessages(updatedMessages);
+    if (!API_KEY) {
+      console.error("API Key is missing");
+      return null;
+    }
 
-    const body = JSON.stringify({
-      model: "mistral-small-latest",
-      stream: true,
-      messages: updatedMessages,
-    });
-
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
+    setIsCurrentlyGenerating(true);
 
     try {
+      // Step 1: Retrieve Google Search Results
+      const googleResults = await searchGoogle(prompt);
+
+      // Step 2: Extract meaningful snippets from search results
+      const googleSummary = googleResults.organic_results?.slice(0, 3)
+        .map((result: { title: string; snippet: string }) => `- ${result.title}: ${result.snippet}`)
+        .join("\n") || "No relevant information found.";
+
+      // Step 3: Construct the system message with Google results
+      const systemMessage = `Based on recent search results, here is relevant information:\n\n${googleSummary}\n\nNow answer the user's question accurately.`;
+
+      // Step 4: Prepare messages for Mistral AI
+      const updatedMessages = [
+        { role: "system", content: systemMessage },
+        { role: "user", content: prompt }
+      ];
+      setMessages(updatedMessages);
+
+      // Step 5: Call Mistral AI API
+      const body = JSON.stringify({
+        model: "mistral-small-latest",
+        stream: true,
+        messages: updatedMessages,
+      });
+
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
       const response = await fetch(API_URL, {
         method: "POST",
         headers: {
@@ -139,6 +192,7 @@ function Home() {
         return null;
       }
 
+      // Step 6: Process Streaming Response
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let aiResponse = "";
@@ -169,7 +223,7 @@ function Home() {
           updatedMessages[updatedMessages.length - 1].content = aiResponse;
         }
 
-        setMessages([...updatedMessages]); // Mise à jour du state
+        setMessages([...updatedMessages]); // Update state
       };
 
       while (true) {
@@ -185,8 +239,14 @@ function Home() {
 
         const chunk = decoder.decode(value, { stream: true });
         const lines = chunk.split("\n").filter(line => line.trim() !== "");
+
         for (const line of lines) {
+          if (line.trim() === "[DONE]") {
+            // Ignore and break when reaching the end of stream
+            break;
+          }
           if (!line.startsWith("data:")) continue;
+
           const jsonStr = line.replace("data:", "").trim();
           try {
             const parsed = JSON.parse(jsonStr);
@@ -215,6 +275,7 @@ function Home() {
       return null;
     }
   };
+
 
   return (
     <>
