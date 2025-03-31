@@ -161,7 +161,7 @@ function Home() {
       const systemMessage = `Based on recent search results, here is relevant information:\n\n${googleSummary}\n\nNow answer the user's question accurately.`;
 
       // Step 4: Prepare messages for Mistral AI
-      const updatedMessages = [
+      const updatedMessages = [...(messages || []),
         { role: "system", content: systemMessage },
         { role: "user", content: prompt }
       ];
