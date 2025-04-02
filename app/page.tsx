@@ -9,6 +9,7 @@ import AiMessageBox from "./components/aiMessage";
 
 import "./styles/chat.scss";
 import nexodusImage from "../public/nexodus.png";
+import CheckboxSearch from "./components/chkSearch";
 
 function Home() {
   const chatRef = useRef<HTMLElement>(null);
@@ -20,9 +21,11 @@ function Home() {
   const [messageCount, setMessageCount] = useState<number>(0);
   const [isCurrentlyGenerating, setIsCurrentlyGenerating] = useState<boolean>(false);
   const [stopGenerate, setStopGenerate] = useState<boolean>(false);
-  const [preferBottom, setPreferBottom] = useState<boolean>(true);
+  const [preferBottom, setPreferBottom] = useState<boolean>();
   const abortControllerRef = useRef<AbortController | null>(null);
   const preferBottomRef = useRef(preferBottom);
+  const [isOnlineSearch, setIsOnlineSearch] = useState(false);
+
 
   // useEffect here to check if user prefer to be scrolled automatically while AI generates a response.
   useEffect(() => {
@@ -129,7 +132,7 @@ function Home() {
       }
       const data = await response.json();
       console.log("Google Search Results:", data);
-      return data || []; // `results` est la clé correcte selon la documentation
+      return stopGenerate ? [] : data || []; // `results` est la clé correcte selon la documentation
     } catch (error) {
       console.error("Error fetching Google search results:", error);
       return [];
@@ -149,22 +152,30 @@ function Home() {
     setIsCurrentlyGenerating(true);
 
     try {
-      // Step 1: Retrieve Google Search Results
-      const googleResults = await searchGoogle(prompt);
+      let systemMessage = "";
+      if (isOnlineSearch) {
+        // Step 1: Retrieve Google Search Results
+        const googleResults = await searchGoogle(prompt);
 
-      // Step 2: Extract meaningful snippets from search results
-      const googleSummary = googleResults.organic_results?.slice(0, 3)
-        .map((result: { title: string; snippet: string }) => `- ${result.title}: ${result.snippet}`)
-        .join("\n") || "No relevant information found.";
+        // Step 2: Extract meaningful snippets from search results
+        const googleSummary = googleResults.organic_results?.slice(0, 3)
+          .map((result: { title: string; snippet: string }) => `- ${result.title}: ${result.snippet}`)
+          .join("\n") || "No relevant information found.";
 
-      // Step 3: Construct the system message with Google results
-      const systemMessage = `Based on recent search results, here is relevant information:\n\n${googleSummary}\n\nNow answer the user's question accurately.`;
-
+        // Step 3: Construct the system message with Google results
+        systemMessage = `Based on recent search results, here is relevant information:\n\n${googleSummary}\n\nNow answer the user's question accurately. and take concious about previous message.`;
+        console.log("Google Search Results:", googleResults);
+      }
+      if (stopGenerate) {
+        return null;
+      }
       // Step 4: Prepare messages for Mistral AI
-      const updatedMessages = [...(messages || []),
-        { role: "system", content: systemMessage },
+      const updatedMessages = [
+        ...(messages || []),
+        ...(isOnlineSearch ? [{ role: "user", content: systemMessage }] : []),
         { role: "user", content: prompt }
       ];
+
       setMessages(updatedMessages);
 
       // Step 5: Call Mistral AI API
@@ -213,17 +224,19 @@ function Home() {
       let assistantPlaceholderAdded = false;
 
       const updateMessage = (newText: string) => {
-        aiResponse += newText;
-        root.render(<AiMessageBox message={aiResponse} />);
+        if (!stopGenerate) {
+          aiResponse += newText;
+          root.render(<AiMessageBox message={aiResponse} />);
 
-        if (!assistantPlaceholderAdded) {
-          updatedMessages.push({ role: "assistant", content: aiResponse });
-          assistantPlaceholderAdded = true;
-        } else {
-          updatedMessages[updatedMessages.length - 1].content = aiResponse;
+          if (!assistantPlaceholderAdded) {
+            updatedMessages.push({ role: "assistant", content: aiResponse });
+            assistantPlaceholderAdded = true;
+          } else {
+            updatedMessages[updatedMessages.length - 1].content = aiResponse;
+          }
+
+          setMessages([...updatedMessages]); // Update state
         }
-
-        setMessages([...updatedMessages]); // Update state
       };
 
       while (true) {
@@ -291,6 +304,7 @@ function Home() {
           </div>
         </article>
         <article className="messageBox">
+          <CheckboxSearch checked={isOnlineSearch} setChecked={setIsOnlineSearch} />
           <textarea name="promptArea" id="promptArea" onKeyDown={handleKeyDown} placeholder="Type a prompt..." ref={textareaRef}></textarea>
           <button onClick={handleButton} ref={sendButtonRef}>Send</button>
         </article>
