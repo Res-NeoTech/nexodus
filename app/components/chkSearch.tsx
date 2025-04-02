@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 const CheckboxSearch = ({ checked, setChecked }: { checked: boolean; setChecked: (checked: boolean) => void }) => {
     return (
