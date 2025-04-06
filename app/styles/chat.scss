@@ -171,6 +171,14 @@ main {
             transition: all 0.3s;
         }
     }
+
+    .search {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
 }
 
 @media (min-width: 993px) AND (max-width: 1200px) {

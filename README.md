@@ -8,6 +8,7 @@ Nexodus is a React and Next.js-powered AI chat application that leverages the Mi
 - **History**: View and manage chat history(not completely implemented yet).
 - **Markdown Processing**: Support for Markdown formatting in chat messages.
 - **Code highlighting**: Detects and highlights almost any programming language syntax.
+- **Built-in Search Engine**: Summarizes search results for a query that user typed as a prompt.
 
 ## Technologies
 
@@ -35,7 +36,14 @@ npm run dev
 ```bash
 npm run build
 ```
+6. **(Optional) Use ESLint**
+
+Very useful to scan for TypeScript potential errors or warnings. Always make sure there are no ESLint errors before you contribute, warnings are accepted but not encouraged.
+```bash
+npm run lint
+```
 5. **Usage**
+
 To use Nexodus, simply run the development server using npm run dev and open your browser to http://localhost:3000. You can start chatting with the AI and explore the features like chat history and Markdown processing.
 
 ## Contributing

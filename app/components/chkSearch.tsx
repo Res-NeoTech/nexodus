@@ -2,8 +2,8 @@ import React from "react";
 
 const CheckboxSearch = ({ checked, setChecked }: { checked: boolean; setChecked: (checked: boolean) => void }) => {
     return (
-        <button onClick={() => setChecked(!checked)}>
-            {checked ? "Online search" : "Offline search"}
+        <button className="search" onClick={() => setChecked(!checked)}>
+            {checked ? "Online" : "Offline"}
         </button>
     );
 };

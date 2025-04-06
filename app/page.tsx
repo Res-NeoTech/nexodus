@@ -109,37 +109,13 @@ function Home() {
       sendMessage();
     }
   };
+
   /**
-   * Function to search Google using the Search API.
-   * @author FauZaPespi
-   * @param query The search query to be sent to the Google Search API.
-   * @returns informations
+   * Calls a Mistral API with a user-entered prompt and renders the response. Also calls BraveSearchAPI if user wishes to run web search.
+   * @param prompt Prompt entered by user.
+   * @author NeoTech, FauZaPespi
+   * @returns a promise, this returned promise is nowhere used.
    */
-  const searchGoogle = async (query: string) => {
-    const API_KEY = process.env.NEXT_PUBLIC_SEARCH_API_KEY;
-    console.log("searchAPIKey", API_KEY);
-    const API_URL = `https://www.searchapi.io/api/v1/search`;
-
-    if (!API_KEY) {
-      console.error("API Key is missing");
-      return [];
-    }
-
-    try {
-      const response = await fetch(`${API_URL}?engine=google&api_key=${API_KEY}&q=${encodeURIComponent(query)}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log("Google Search Results:", data);
-      return stopGenerate ? [] : data || []; // `results` est la clé correcte selon la documentation
-    } catch (error) {
-      console.error("Error fetching Google search results:", error);
-      return [];
-    }
-  };
-
-
   const callMistralAPI = async (prompt: string): Promise<string | null> => {
     const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
     const API_URL = "https://api.mistral.ai/v1/chat/completions";
@@ -151,22 +127,48 @@ function Home() {
 
     setIsCurrentlyGenerating(true);
 
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
     try {
       let systemMessage = "";
       if (isOnlineSearch) {
         // Step 1: Retrieve Google Search Results
-        const googleResults = await searchGoogle(prompt);
-
-        // Step 2: Extract meaningful snippets from search results
-        const googleSummary = googleResults.organic_results?.slice(0, 3)
-          .map((result: { title: string; snippet: string }) => `- ${result.title}: ${result.snippet}`)
+        const googleResults = await fetch(`/api/search-brave?q=${encodeURIComponent(prompt)}`, {
+          signal: abortController.signal, // Attach the AbortController signal
+        })
+          .then((res) => {
+            if (!res.ok) throw new Error(`Status ${res.status}`);
+            return res.json();
+          })
+          .catch((err) => {
+            if (abortController.signal.aborted) {
+              return null;
+            }
+            console.error("Error during Brave search:", err);
+            return null;
+          });
+  
+        if (stopGenerate || !googleResults) {
+          setIsCurrentlyGenerating(false);
+          return null;
+        }
+  
+        const resultsArray = Array.isArray(googleResults?.results) ? googleResults.results : [];
+  
+        // Step 3: Extract meaningful snippets from search results
+        const googleSummary = resultsArray
+          .slice(0, 3)
+          .map((result: { title: string; description: string }) => `- ${result.title}: ${result.description}`)
           .join("\n") || "No relevant information found.";
-
-        // Step 3: Construct the system message with Google results
-        systemMessage = `Based on recent search results, here is relevant information:\n\n${googleSummary}\n\nNow answer the user's question accurately. and take concious about previous message.`;
-        console.log("Google Search Results:", googleResults);
+  
+        // Step 4: Construct the system message with Google results
+        systemMessage = `Based on recent search results, here is relevant information:\n\n${googleSummary}\n\nNow answer the user's question accurately, and take conscious about the previous message.`;
+        console.log("Google Search Results:", resultsArray);
       }
+      
       if (stopGenerate) {
+        setIsCurrentlyGenerating(false);
         return null;
       }
       // Step 4: Prepare messages for Mistral AI
