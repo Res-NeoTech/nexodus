@@ -159,7 +159,7 @@ const Squares: React.FC<SquaresProps> = ({
     };
   }, [direction, speed, borderColor, hoverFillColor, squareSize]);
 
-  return <canvas ref={canvasRef} className="w-full h-full border-none block fixed -z-10"></canvas>;
+  return <canvas ref={canvasRef} className="w-full h-full border-none block fixed"></canvas>;
 };
 
 export default Squares;
