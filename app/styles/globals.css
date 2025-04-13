@@ -6,14 +6,6 @@
   --dots: rgb(24, 24, 24);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: #ffffff;
-    --foreground: #000000;
-    --dots: rgb(211, 211, 211);
-  }
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -29,16 +21,13 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: "Inter", sans-serif;
-  background-image: radial-gradient(circle, var(--dots) 1px, transparent 1px);
-  background-size: 30px 30px; /* Controls spacing */
-  background-attachment: fixed;
 }
 
 h1 {
   font-size: 2.986rem;
   line-height: 1.2;
   font-optical-sizing: auto;
-  font-weight: 500;
+  font-weight: 600;
   font-style: normal;
 }
 
@@ -46,7 +35,7 @@ h2 {
   font-size: 2.488rem;
   line-height: 1.8;
   font-optical-sizing: auto;
-  font-weight: 400;
+  font-weight: 500;
   font-style: normal;
 }
 
@@ -54,7 +43,7 @@ h3 {
   font-size: 2.074rem;
   line-height: 1.8;
   font-optical-sizing: auto;
-  font-weight: 300;
+  font-weight: 400;
   font-style: normal;
 }
 
@@ -62,7 +51,7 @@ h4 {
   font-size: 1.728rem;
   line-height: 1.8;
   font-optical-sizing: auto;
-  font-weight: 300;
+  font-weight: 400;
   font-style: normal;
 }
 
@@ -70,7 +59,7 @@ h5 {
   font-size: 1.44rem;
   line-height: 1.8;
   font-optical-sizing: auto;
-  font-weight: 300;
+  font-weight: 400;
   font-style: normal;
 }
 
@@ -78,7 +67,7 @@ h6 {
   font-size: 1.2rem;
   line-height: 1.8;
   font-optical-sizing: auto;
-  font-weight: 300;
+  font-weight: 400;
   font-style: normal;
 }
 
@@ -88,4 +77,8 @@ p {
   font-optical-sizing: auto;
   font-weight: 300;
   font-style: normal;
+}
+
+li{
+  line-height: 2;
 }

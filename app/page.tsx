@@ -2,14 +2,20 @@
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import ReactDOM from "react-dom/client";
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
 import anime from "animejs";
 
 import UserMessageBox from "./components/userMessage";
 import AiMessageBox from "./components/aiMessage";
 
 import "./styles/chat.scss";
+import 'react-tooltip/dist/react-tooltip.css'
 import nexodusImage from "../public/nexodus.png";
+import sendIcon from "../public/send.png";
+import stopIcon from "../public/stop.png";
 import CheckboxSearch from "./components/chkSearch";
+import Squares from './components/Squares/Squares';
 
 function Home() {
   const chatRef = useRef<HTMLElement>(null);
@@ -24,7 +30,9 @@ function Home() {
   const [preferBottom, setPreferBottom] = useState<boolean>();
   const abortControllerRef = useRef<AbortController | null>(null);
   const preferBottomRef = useRef(preferBottom);
-  const [isOnlineSearch, setIsOnlineSearch] = useState(false);
+  const [isOnlineSearch, setIsOnlineSearch] = useState<boolean>(false);
+  const [messageIcon, setMessageIcon] = useState<typeof sendIcon>(sendIcon);
+  const [messageState, setMessageState] = useState<string>("Send");
 
 
   // useEffect here to check if user prefer to be scrolled automatically while AI generates a response.
@@ -62,7 +70,8 @@ function Home() {
       }
 
       if (sendButtonRef.current) {
-        sendButtonRef.current.textContent = "Stop";
+        setMessageIcon(stopIcon);
+        setMessageState("Stop");
       }
 
       if (textareaRef.current) {
@@ -92,7 +101,8 @@ function Home() {
         abortControllerRef.current.abort();
       }
       if (sendButtonRef.current) {
-        sendButtonRef.current.textContent = "Send";
+        setMessageIcon(sendIcon);
+        setMessageState("Send");
       }
       anime.remove(".aiAnim-" + messageCount); // Reset animation for the current message
       console.log(messages);
@@ -148,25 +158,25 @@ function Home() {
             console.error("Error during Brave search:", err);
             return null;
           });
-  
+
         if (stopGenerate || !googleResults) {
           setIsCurrentlyGenerating(false);
           return null;
         }
-  
+
         const resultsArray = Array.isArray(googleResults?.results) ? googleResults.results : [];
-  
+
         // Step 3: Extract meaningful snippets from search results
         const googleSummary = resultsArray
           .slice(0, 3)
           .map((result: { title: string; description: string }) => `- ${result.title}: ${result.description}`)
           .join("\n") || "No relevant information found.";
-  
+
         // Step 4: Construct the system message with Google results
         systemMessage = `Based on recent search results, here is relevant information:\n\n${googleSummary}\n\nNow answer the user's question accurately, and take conscious about the previous message.`;
         console.log("Google Search Results:", resultsArray);
       }
-      
+
       if (stopGenerate) {
         setIsCurrentlyGenerating(false);
         return null;
@@ -281,7 +291,8 @@ function Home() {
       setMessageCount((prev) => Number(prev) + 1);
       setIsCurrentlyGenerating(false);
       if (sendButtonRef.current) {
-        sendButtonRef.current.textContent = "Send";
+        setMessageIcon(sendIcon);
+        setMessageState("Send");
       }
       return null;
     } catch (err) {
@@ -291,10 +302,16 @@ function Home() {
     }
   };
 
-
   return (
     <>
       <main>
+        <Squares
+          speed={0.5}
+          squareSize={25}
+          direction='down' // up, down, left, right, diagonal
+          borderColor='#181818'
+          hoverFillColor='#147373'
+        />
         <article id="chat" ref={chatRef}>
           <div className="greeting" id="greeting" ref={greetingRef} >
             <Image src={nexodusImage}
@@ -306,9 +323,18 @@ function Home() {
           </div>
         </article>
         <article className="messageBox">
-          <CheckboxSearch checked={isOnlineSearch} setChecked={setIsOnlineSearch} />
           <textarea name="promptArea" id="promptArea" onKeyDown={handleKeyDown} placeholder="Type a prompt..." ref={textareaRef}></textarea>
-          <button onClick={handleButton} ref={sendButtonRef}>Send</button>
+          <div className="promptBoxButtons">
+            <CheckboxSearch checked={isOnlineSearch} setChecked={setIsOnlineSearch} />
+            <button data-tooltip-id="messageControl" data-tooltip-content={messageState} onClick={handleButton} ref={sendButtonRef}>
+              <Image src={messageIcon}
+                width={32}
+                height={32}
+                draggable={false}
+                alt="Send Icon" />
+            </button>
+            <Tooltip id="messageControl" style={{ borderRadius: 10, backgroundColor: "black" }}/>
+          </div>
         </article>
       </main>
     </>

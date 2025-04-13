@@ -1,9 +1,7 @@
 /* Color Theme Swatches in Hex */
 $promptBox: #131313;
-$hacker-blue-2-hex: #093040;
-$hacker-blue-3-hex: #0E5259;
-$hacker-blue-4-hex: #147373;
-$hacker-blue-5-hex: #21A698;
+$hacker-blue-4: #147373;
+$hacker-blue-5: #21A698;
 
 main {
     display: flex;
@@ -28,28 +26,19 @@ main {
     opacity: 0;
     transform: translateY(-50%);
 
-    h1 {
-        color: $hacker-blue-5-hex;
+    h1, h2 {
+        color: $hacker-blue-5;
     }
 
-    h2 {
-        color: $hacker-blue-4-hex;
-    }
-
-    h3 {
-        color: $hacker-blue-3-hex;
-    }
-
-    h4 {
-        color: $hacker-blue-2-hex;
+    h3, h4 {
+        color: $hacker-blue-4;
     }
 
     div {
         background-color: rgba(0, 0, 0, 0.548);
-        border: 1px $promptBox solid;
+        border: 1px solid $promptBox;
         padding: 15px;
         border-radius: 10px;
-        border-left: $hacker-blue-3-hex 10px solid;
         box-shadow: rgba(167, 167, 167, 0.1) 0px 0px 20px 0px;
         backdrop-filter: blur(10px);
 
@@ -57,60 +46,27 @@ main {
             width: 100%;
         }
 
-        a {
-            text-decoration: underline;
-            color: $hacker-blue-4-hex;
+        a, strong {
+            color: $hacker-blue-5;
         }
 
         section {
             overflow-x: scroll;
             background-color: $promptBox !important;
-            backdrop-filter: blur(10px);
-        }
-
-        strong {
-            color: $hacker-blue-5-hex;
         }
 
         hr {
-            margin-top: 50px;
-            margin-bottom: 50px;
+            margin: 50px 0;
         }
 
-        p {
-            strong {
-                color: $hacker-blue-4-hex;
-                font-weight: 700;
-                font-size: 1.2rem;
-            }
+        p strong {
+            color: $hacker-blue-4;
+            font-weight: 700;
+            font-size: 1.2rem;
         }
     }
-}
 
-.aiMessage {
     word-wrap: break-word;
-
-    h1 {
-        color: $hacker-blue-5-hex;
-    }
-
-    div {
-        h1 {
-            color: $hacker-blue-2-hex;
-        }
-    }
-
-    h2 {
-        color: $hacker-blue-3-hex;
-    }
-
-    h3 {
-        color: $hacker-blue-4-hex;
-    }
-
-    h4 {
-        color: $hacker-blue-5-hex;
-    }
 }
 
 .greeting {
@@ -121,13 +77,12 @@ main {
     top: 75px;
 
     img {
-        margin-left: auto;
-        margin-right: auto;
+        margin: 0 auto;
     }
 
     h5 {
         text-align: center;
-        color: $hacker-blue-5-hex;
+        color: $hacker-blue-5;
     }
 }
 
@@ -135,16 +90,17 @@ main {
     width: 50%;
     border-radius: 10px;
     display: flex;
+    flex-direction: column;
     background-color: $promptBox;
-    height: 100px;
+    height: 150px;
     position: sticky;
     margin-top: 100px;
     bottom: 50px;
     box-shadow: rgba(167, 167, 167, 0.1) 0px 0px 20px 0px;
 
     textarea {
-        width: 90%;
-        height: 100%;
+        width: 100%;
+        height: 75%;
         resize: none;
         padding: 10px;
 
@@ -153,40 +109,43 @@ main {
         }
 
         &::placeholder {
-            color: $hacker-blue-4-hex;
+            color: $hacker-blue-4;
         }
     }
 
-    button {
-        width: 10%;
-        height: 100%;
-        color: #21A698;
-        transition: all 0.3s;
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
+    .promptBoxButtons{
+        height: 25%;
+        justify-content: right;
+        display: flex;
+        margin: 10px;
+        margin-bottom: 20px;
 
-        &:hover {
-            background-color: $hacker-blue-3-hex;
-            color: #0e0e0e;
+        img{
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button {
+            width: 48px;
+            height: 48px;
+            background-color: #1d1d1d;
+            border-radius: 10px;
             transition: all 0.3s;
+            margin-left: 10px;
+    
+            &:hover {
+                cursor: pointer;
+            }
         }
-    }
 
-    .search {
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-
-        border-top-left-radius: 10px;
-        border-bottom-left-radius: 10px;
+        .active {
+            background-color: white;
+        }
     }
 }
 
-@media (min-width: 993px) AND (max-width: 1200px) {
-    #chat {
-        width: 75%;
-    }
-
-    .messageBox {
+@media (min-width: 993px) and (max-width: 1200px) {
+    #chat, .messageBox {
         width: 75%;
     }
 }
@@ -199,10 +158,9 @@ main {
     .messageBox {
         width: 100%;
         bottom: 0;
-        position: sticky;
+        margin-top: 50px;
         border-bottom-right-radius: 0;
         border-bottom-left-radius: 0;
-        margin-top: 50px;
 
         textarea {
             width: 80%;
@@ -212,78 +170,5 @@ main {
             width: 20%;
             border-bottom-right-radius: 0;
         }
-    }
-}
-
-@media (prefers-color-scheme: light) {
-    $promptBox: #f9f9f9;
-    $hacker-blue-2-hex: #b8d1de;
-    $hacker-blue-3-hex: #8fbccf;
-    $hacker-blue-4-hex: #6697b9;
-    $hacker-blue-5-hex: #3d82aa;
-
-    .userMessage,
-    .aiMessage {
-        h1 {
-            color: $hacker-blue-5-hex;
-        }
-
-        h2 {
-            color: $hacker-blue-4-hex;
-        }
-
-        h3 {
-            color: $hacker-blue-3-hex;
-        }
-
-        h4 {
-            color: $hacker-blue-2-hex;
-        }
-
-        div {
-            background-color: rgba(255, 255, 255, 0.8);
-            border: 1px $promptBox solid;
-            border-left: $hacker-blue-3-hex 10px solid;
-
-            a {
-                color: $hacker-blue-4-hex;
-            }
-
-            strong {
-                color: $hacker-blue-5-hex;
-            }
-
-            section {
-                background-color: $promptBox !important;
-            }
-
-            p {
-                strong {
-                    color: $hacker-blue-4-hex;
-                }
-            }
-        }
-    }
-
-    .messageBox {
-        background-color: $promptBox;
-        box-shadow: none;
-
-        textarea::placeholder {
-            color: $hacker-blue-4-hex;
-        }
-
-        button {
-            color: $hacker-blue-5-hex;
-
-            &:hover {
-                background-color: $hacker-blue-3-hex;
-                color: #fff;
-            }
-        }
-    }
-
-    .greeting h5 {
-        color: $hacker-blue-5-hex;
     }
 }
