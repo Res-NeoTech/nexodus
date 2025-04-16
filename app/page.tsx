@@ -10,7 +10,6 @@ import UserMessageBox from "./components/userMessage";
 import AiMessageBox from "./components/aiMessage";
 
 import "./styles/chat.scss";
-import 'react-tooltip/dist/react-tooltip.css'
 import nexodusImage from "../public/nexodus.png";
 import sendIcon from "../public/send.png";
 import stopIcon from "../public/stop.png";
@@ -128,7 +127,7 @@ function Home() {
    */
   const callMistralAPI = async (prompt: string): Promise<string | null> => {
     const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
-    const API_URL = "https://api.mistral.ai/v1/chat/completions";
+    const API_URL: string = "https://api.mistral.ai/v1/chat/completions";
 
     if (!API_KEY) {
       console.error("API Key is missing");
