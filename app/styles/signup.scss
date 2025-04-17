@@ -13,6 +13,11 @@ img{
     margin-bottom: 100px;
 }
 
+h1{
+    text-align: center;
+    margin-bottom: 100px;
+}
+
 .leftContent{
     display: flex;
     flex-direction: column;
@@ -20,7 +25,7 @@ img{
     border-right: $hacker-blue-5 1px solid;
     justify-content: space-evenly;
 
-    h1, h5, div{
+    h4, div{
         margin-top: 10px;
         margin-bottom: 10px;
         text-align: center;
@@ -91,5 +96,26 @@ img{
                 transform: scale(0.95);
             }
         }
+    }
+}
+
+@media (max-width: 992px) {
+    .signSection{
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .rightContent{
+        width: 100%;
+
+        form{
+            width: 75%;
+        }
+    }
+
+    .leftContent{
+        width: 90%;
+        border: none;
+        margin-bottom: 100px;
     }
 }

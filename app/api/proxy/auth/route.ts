@@ -6,54 +6,23 @@ import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adap
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // FOR DEVELOPMENT ONLY, COMMENT IN PRODUCTION.
 const API_URL: string = "https://nexapi.maksym.ch";
 
-export async function GET() {
-    try {
-        const cookieStore: ReadonlyRequestCookies = await cookies();
-        const token = cookieStore.get("token");
-
-        if (!token) {
-            return NextResponse.json({ error: "Token not found" }, { status: 401 });
-        }
-
-        const request = await fetch(`${API_URL}/crud/user`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Nexodus ${token.value}`
-            }
-        })
-
-        if (request.status !== 200) {
-            const result = await request.text();
-            return NextResponse.json({ error: result }, { status: request.status });
-        }
-
-        const result = await request.json();
-
-        return NextResponse.json({ result }, { status: 200 });
-    } catch (error) {
-        console.error("Proxy error:", error);
-        return NextResponse.json({ error: "Internal server error", details: String(error) }, { status: 500 });
-    }
-}
-
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const name: string = body.name;
         const email: string = body.email;
         const password: string = body.password;
 
-        if (!name || !email || !password) {
+        if (!email || !password) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
-        const request = await fetch(`${API_URL}/crud/user`, {
+        const request = await fetch(`${API_URL}/crud/auth`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, email, password }),
+            body: JSON.stringify({ email, password }),
         });
 
-        if (request.status !== 201) {
+        if (request.status !== 200) {
             const result = await request.text();
             return NextResponse.json({ error: result }, { status: request.status });
         }
@@ -66,7 +35,7 @@ export async function POST(req: Request) {
         }
 
         // Setting a token into a cookie
-        const cookieStore = await cookies();
+        const cookieStore: ReadonlyRequestCookies = await cookies();
         cookieStore.set("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
@@ -75,7 +44,7 @@ export async function POST(req: Request) {
             maxAge: 60 * 60 * 24 * 7, // 7 days cookie
         });
 
-        return NextResponse.json({ result }, { status: 201 });
+        return NextResponse.json({ result }, { status: 200 });
 
     } catch (error) {
         console.error("Proxy error:", error);

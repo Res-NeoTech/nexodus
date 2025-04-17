@@ -6,18 +6,18 @@ import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import anime from "animejs";
 
-import UserMessageBox from "./components/userMessage";
-import AiMessageBox from "./components/aiMessage";
-import Header from "./components/header";
+import UserMessageBox from "../userMessage";
+import AiMessageBox from "../aiMessage";
+import Header from "../header";
 
-import "./styles/chat.scss";
-import nexodusImage from "../public/nexodus.png";
-import sendIcon from "../public/send.png";
-import stopIcon from "../public/stop.png";
-import CheckboxSearch from "./components/chkSearch";
-import Squares from './components/Squares/Squares';
+import "../../styles/chat.scss";
+import nexodusImage from "../../../public/nexodus.png";
+import sendIcon from "../../../public/send.png";
+import stopIcon from "../../../public/stop.png";
+import CheckboxSearch from "../chkSearch";
+import Squares from '../Squares/Squares';
 
-function Home() {
+function Home({ username }: { username: string }) {
   const chatRef = useRef<HTMLElement>(null);
   const greetingRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -33,7 +33,7 @@ function Home() {
   const [isOnlineSearch, setIsOnlineSearch] = useState<boolean>(false);
   const [messageIcon, setMessageIcon] = useState<typeof sendIcon>(sendIcon);
   const [messageState, setMessageState] = useState<string>("Send");
-  const [username, setUsername] = useState<string>("You");
+
 
   // useEffect here to check if user prefer to be scrolled automatically while AI generates a response.
   useEffect(() => {
@@ -49,19 +49,6 @@ function Home() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    const getUser = async () => {
-      const request = await fetch("/api/proxy/crud");
-      const data = await request.json();
-  
-      if (request.status === 200) {
-        setUsername(data.result.name);
-      }
-    };
-  
-    getUser();
   }, []);
 
   useEffect(() => {

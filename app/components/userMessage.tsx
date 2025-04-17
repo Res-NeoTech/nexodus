@@ -1,10 +1,10 @@
 import React from "react";
 import ReactMarkdown from 'react-markdown';
 
-const UserMessageBox = ({ message }: { message: string }) => {
+const UserMessageBox = ({ username, message }: { username: string; message: string }) => {
     return (
         <>
-            <h1>You</h1>
+            <h1>{username}</h1>
             <div>
                 <ReactMarkdown>{message}</ReactMarkdown>
             </div>
