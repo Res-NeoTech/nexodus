@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 
 /**
  * Brave Search - GET Endpoint
@@ -25,14 +24,14 @@ export async function GET(req: Request) {
   }
 
   try {
-    const cookieStore: ReadonlyRequestCookies = await cookies();
+    const cookieStore = await cookies();
     const token = cookieStore.get("token");
 
     if (token) {
       const request = await fetch(`https://nexapi.maksym.ch/crud/user`, {
         method: "GET",
         headers: {
-          "Authorization": `Nexodus ${token.value}`
+          "x-nexodus-token": `Nexodus ${token.value}`
         }
       })
 

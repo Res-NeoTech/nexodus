@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 
-//const API_URL: string = process.env.NODE_ENV === "production" ? "https://nexapi.maksym.ch" : "http://localhost:5125";
+const API_URL: string = process.env.NODE_ENV === "production" ? "https://nexapi.maksym.ch" : "http://localhost:5125";
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // FOR DEVELOPMENT ONLY, COMMENT IN PRODUCTION.
-const API_URL: string = "https://nexapi.maksym.ch";
 
 export async function POST(req: Request) {
     try {
@@ -35,7 +33,7 @@ export async function POST(req: Request) {
         }
 
         // Setting a token into a cookie
-        const cookieStore: ReadonlyRequestCookies = await cookies();
+        const cookieStore = await cookies();
         cookieStore.set("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",

@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 
-//const API_URL: string = process.env.NODE_ENV === "production" ? "https://nexapi.maksym.ch" : "http://localhost:5125";
+const API_URL: string = process.env.NODE_ENV === "production" ? "https://nexapi.maksym.ch" : "http://localhost:5125";
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // FOR DEVELOPMENT ONLY, COMMENT IN PRODUCTION.
-const API_URL: string = "https://nexapi.maksym.ch";
 
 export async function GET() {
     try {
-        const cookieStore: ReadonlyRequestCookies = await cookies();
+        const cookieStore = await cookies();
         const token = cookieStore.get("token");
 
         if (!token) {
@@ -18,12 +16,13 @@ export async function GET() {
         const request = await fetch(`${API_URL}/crud/user`, {
             method: "GET",
             headers: {
-                "Authorization": `Nexodus ${token.value}`
+                "x-nexodus-token": `Nexodus ${token.value}`
             }
         })
 
         if (request.status !== 200) {
             const result = await request.text();
+            console.error(result)
             return NextResponse.json({ error: result }, { status: request.status });
         }
 
@@ -49,9 +48,11 @@ export async function POST(req: Request) {
 
         const request = await fetch(`${API_URL}/crud/user`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({ name, email, password }),
-        });
+          });
 
         if (request.status !== 201) {
             const result = await request.text();

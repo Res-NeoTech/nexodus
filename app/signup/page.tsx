@@ -109,7 +109,7 @@ function SignUp() {
                 height={300}
                 draggable={false}
                 alt="Logo of Nexodus" />
-                <h1>Sign up</h1>
+                <h1 className="heading">Sign up</h1>
             <section className="signSection">
                 <div className="leftContent">
                     <h4>Create a free account for following benefits:</h4>

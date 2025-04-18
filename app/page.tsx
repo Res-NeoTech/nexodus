@@ -34,6 +34,7 @@ function Home() {
   const [messageIcon, setMessageIcon] = useState<typeof sendIcon>(sendIcon);
   const [messageState, setMessageState] = useState<string>("Send");
   const [username, setUsername] = useState<string>("You");
+  const [currentChatId, setCurrentChatId] = useState<string>("NONE");
 
   // useEffect here to check if user prefer to be scrolled automatically while AI generates a response.
   useEffect(() => {
@@ -55,12 +56,12 @@ function Home() {
     const getUser = async () => {
       const request = await fetch("/api/proxy/crud");
       const data = await request.json();
-  
+
       if (request.status === 200) {
         setUsername(data.result.name);
       }
     };
-  
+
     getUser();
   }, []);
 
@@ -104,7 +105,7 @@ function Home() {
         easing: "easeOutExpo"
       });
       setIsCurrentlyGenerating(true);
-      callMistralAPI(prompt);
+      callMistralAPI(prompt)
     }
   }
 
@@ -152,6 +153,25 @@ function Home() {
 
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
+    let chatId: string = currentChatId;
+
+    if (isFirstMessage) {
+      const createChatRequest = await fetch("/api/proxy/chats", {
+        method: "POST",
+        body: JSON.stringify({ role: "user", content: prompt })
+      });
+
+      if (createChatRequest.status === 201) {
+        const data = await createChatRequest.json();
+        chatId = data.result.id;
+        setCurrentChatId(chatId);
+      }
+    } else {
+      fetch("/api/proxy/chats/append?id=" + chatId, {
+        method: "PUT",
+        body: JSON.stringify({ role: "user", content: prompt })
+      })
+    }
 
     try {
       let systemMessage = "";
@@ -186,7 +206,7 @@ function Home() {
           .join("\n") || "No relevant information found.";
 
         // Step 4: Construct the system message with Google results
-        systemMessage = `Based on recent search results, here is relevant information:\n\n${googleSummary}\n\nNow answer the user's question accurately, and take conscious about the previous message.`;
+        systemMessage = `!!SEARCH!! Based on recent search results, here is relevant information:\n\n${googleSummary}\n\nNow answer the user's question accurately, and take conscious about the previous message.`;
         console.log("Google Search Results:", resultsArray);
       }
 
@@ -194,6 +214,14 @@ function Home() {
         setIsCurrentlyGenerating(false);
         return null;
       }
+
+      if (isOnlineSearch) {
+        await fetch("/api/proxy/chats/append?id=" + chatId, {
+          method: "PUT",
+          body: JSON.stringify({ role: "user", content: systemMessage })
+        });
+      }
+
       // Step 4: Prepare messages for Mistral AI
       const updatedMessages = [
         ...(messages || []),
@@ -259,38 +287,35 @@ function Home() {
           } else {
             updatedMessages[updatedMessages.length - 1].content = aiResponse;
           }
-
-          setMessages([...updatedMessages]); // Update state
+          setMessages([...updatedMessages]);
         }
       };
 
       while (true) {
         const { value, done } = await reader.read();
-        if (stopGenerate) {
-          setStopGenerate(false);
-          break;
-        }
-        if (preferBottomRef.current) {
-          window.scrollTo(0, document.documentElement.scrollHeight);
-        }
+      
+        // if (stopGenerate) {
+        //   setStopGenerate(true);
+        //   console.log("Stop Generate")
+        // }
+      
         if (done) break;
-
+      
         const chunk = decoder.decode(value, { stream: true });
         const lines = chunk.split("\n").filter(line => line.trim() !== "");
-
+      
         for (const line of lines) {
           if (line.trim() === "[DONE]") {
-            // Ignore and break when reaching the end of stream
             break;
           }
           if (!line.startsWith("data:")) continue;
-
+      
           const jsonStr = line.replace("data:", "").trim();
           try {
             const parsed = JSON.parse(jsonStr);
             const delta = parsed.choices?.[0]?.delta;
             if (!delta) continue;
-
+      
             if (delta.content) {
               updateMessage(delta.content);
             }
@@ -298,16 +323,23 @@ function Home() {
             console.warn("JSON Parse Error:", error, "Chunk:", jsonStr);
           }
         }
-      }
+      }      
+
+      fetch("/api/proxy/chats/append?id=" + chatId, {
+        method: "PUT",
+        body: JSON.stringify({ role: "assistant", content: aiResponse })
+      })
 
       setMessages([...updatedMessages]);
       setMessageCount((prev) => Number(prev) + 1);
       setIsCurrentlyGenerating(false);
+
       if (sendButtonRef.current) {
         setMessageIcon(sendIcon);
         setMessageState("Send");
       }
-      return null;
+
+      return aiResponse;
     } catch (err) {
       console.error("Request error: ", err);
       setIsCurrentlyGenerating(false);
@@ -332,6 +364,7 @@ function Home() {
               width={400}
               height={400}
               draggable={false}
+              priority={true}
               alt="Logo of Nexodus" />
             <h5>Type a prompt below to start chatting.</h5>
           </div>
@@ -347,7 +380,7 @@ function Home() {
                 draggable={false}
                 alt="Send Icon" />
             </button>
-            <Tooltip id="messageControl" style={{ borderRadius: 10, backgroundColor: "black" }}/>
+            <Tooltip id="messageControl" style={{ borderRadius: 10, backgroundColor: "black" }} />
           </div>
         </article>
       </main>

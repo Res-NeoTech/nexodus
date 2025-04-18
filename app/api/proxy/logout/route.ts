@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 
 export async function GET() {
     try {
-        const cookieStore: ReadonlyRequestCookies = await cookies();
+        const cookieStore = await cookies();
         cookieStore.delete("token");
 
         return NextResponse.json({status: "Successfully logged out."}, { status: 200 });

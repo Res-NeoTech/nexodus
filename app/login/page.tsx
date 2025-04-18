@@ -63,7 +63,7 @@ function LogIn() {
                 height={300}
                 draggable={false}
                 alt="Logo of Nexodus" />
-            <h1>Log In</h1>
+            <h1 className="heading">Log In</h1>
             <form>
                 <label htmlFor="uEmail">Email</label>
                 <input type="text" name="uEmail" id="uEmail" ref={emailRef} required />
