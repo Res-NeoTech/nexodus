@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from 'next/navigation';
 import ReactDOM from "react-dom/client";
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
@@ -35,6 +36,7 @@ function Home() {
   const [messageState, setMessageState] = useState<string>("Send");
   const [username, setUsername] = useState<string>("You");
   const [currentChatId, setCurrentChatId] = useState<string>("NONE");
+  const router = useRouter();
 
   // useEffect here to check if user prefer to be scrolled automatically while AI generates a response.
   useEffect(() => {
@@ -66,14 +68,28 @@ function Home() {
   }, []);
 
   useEffect(() => {
+    if (currentChatId !== "NONE") {
+      setChatIdParam(currentChatId)
+    }
+  }, [currentChatId])
+
+  useEffect(() => {
     preferBottomRef.current = preferBottom;
   }, [preferBottom]);
+
+
+  const setChatIdParam = (chatId: string) => {
+    router.push(`/?chatId=${chatId}`); //pushing chatId to url
+  };
 
   const sendMessage = async () => {
     setStopGenerate(false); // Reset stopGenerate to false at the start
     setMessageCount((prev) => Number(prev) + 1); // Increment messageCount for new animations
-    const prompt: string | undefined = textareaRef.current?.value.trim();
+    let prompt: string | undefined = textareaRef.current?.value.trim();
     if (prompt && !isCurrentlyGenerating) {
+      if(prompt.startsWith("!!SEARCH!!")){
+        prompt = prompt.substring("!!SEARCH!!".length).trim()
+      }
 
       if (isFirstMessage) {
         setIsFirstMessage(false);
@@ -173,6 +189,8 @@ function Home() {
       })
     }
 
+    let aiResponse = "";
+
     try {
       let systemMessage = "";
       if (isOnlineSearch) {
@@ -259,7 +277,6 @@ function Home() {
       // Step 6: Process Streaming Response
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let aiResponse = "";
 
       const aiMessageElement = document.createElement("section");
       aiMessageElement.className = "aiMessage";
@@ -293,29 +310,24 @@ function Home() {
 
       while (true) {
         const { value, done } = await reader.read();
-      
-        // if (stopGenerate) {
-        //   setStopGenerate(true);
-        //   console.log("Stop Generate")
-        // }
-      
+
         if (done) break;
-      
+
         const chunk = decoder.decode(value, { stream: true });
         const lines = chunk.split("\n").filter(line => line.trim() !== "");
-      
+
         for (const line of lines) {
           if (line.trim() === "[DONE]") {
             break;
           }
           if (!line.startsWith("data:")) continue;
-      
+
           const jsonStr = line.replace("data:", "").trim();
           try {
             const parsed = JSON.parse(jsonStr);
             const delta = parsed.choices?.[0]?.delta;
             if (!delta) continue;
-      
+
             if (delta.content) {
               updateMessage(delta.content);
             }
@@ -323,12 +335,13 @@ function Home() {
             console.warn("JSON Parse Error:", error, "Chunk:", jsonStr);
           }
         }
-      }      
+      }
 
-      fetch("/api/proxy/chats/append?id=" + chatId, {
+      // Save the final message to the database
+      await fetch("/api/proxy/chats/append?id=" + chatId, {
         method: "PUT",
         body: JSON.stringify({ role: "assistant", content: aiResponse })
-      })
+      });
 
       setMessages([...updatedMessages]);
       setMessageCount((prev) => Number(prev) + 1);
@@ -342,6 +355,15 @@ function Home() {
       return aiResponse;
     } catch (err) {
       console.error("Request error: ", err);
+
+      // Save the partial message to the database if generation is aborted
+      if (abortControllerRef.current?.signal.aborted) {
+        await fetch("/api/proxy/chats/append?id=" + chatId, {
+          method: "PUT",
+          body: JSON.stringify({ role: "assistant", content: aiResponse })
+        });
+      }
+
       setIsCurrentlyGenerating(false);
       return null;
     }
