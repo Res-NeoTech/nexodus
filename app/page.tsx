@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import ReactDOM from "react-dom/client";
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
@@ -36,7 +36,12 @@ function Home() {
   const [messageState, setMessageState] = useState<string>("Send");
   const [username, setUsername] = useState<string>("You");
   const [currentChatId, setCurrentChatId] = useState<string>("NONE");
+
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const chatId = searchParams.get('chatId');
+  const [hasRenderedInitialMessages, setHasRenderedInitialMessages] = useState(false);
+  const [isHistoryFetched, setIsHistoryFetched] = useState<boolean>(false);
 
   // useEffect here to check if user prefer to be scrolled automatically while AI generates a response.
   useEffect(() => {
@@ -64,8 +69,38 @@ function Home() {
       }
     };
 
+    const getChat = async () => {
+      if (chatId) {
+        const getChatRequest = await fetch("/api/proxy/chats?id=" + chatId);
+
+        if (getChatRequest.status === 200) {
+          setCurrentChatId(chatId);
+          const data = await getChatRequest.json();
+
+          if (Array.isArray(data.result.messages)) {
+            setMessages(data.result.messages);
+            setIsHistoryFetched(true);
+          }
+        }
+      }
+    }
+
     getUser();
+    getChat();
+
   }, []);
+
+  useEffect(() => {
+    if (messages && isHistoryFetched && !hasRenderedInitialMessages) {
+      renderHistoryMessages(messages);
+      setHasRenderedInitialMessages(true);
+      setIsFirstMessage(false);
+      greetingRef.current?.remove();
+      if (chatRef.current) {
+        chatRef.current.style.marginBottom = "0px";
+      }
+    }
+  }, [isHistoryFetched, hasRenderedInitialMessages]);
 
   useEffect(() => {
     if (currentChatId !== "NONE") {
@@ -77,9 +112,42 @@ function Home() {
     preferBottomRef.current = preferBottom;
   }, [preferBottom]);
 
-
   const setChatIdParam = (chatId: string) => {
     router.push(`/?chatId=${chatId}`); //pushing chatId to url
+  };
+
+  const renderHistoryMessages = (historyMessages: { role: string; content: string; }[]) => {
+    historyMessages.forEach((message, index) => {
+      if(message.role === "user" && message.content.startsWith("!!SEARCH!!")) { // Do not render this message because this user prompt is techical for search function.
+        return;
+      }
+      const messageElement = document.createElement('section');
+      messageElement.className = message.role === 'user' ? 'userMessage' : 'aiMessage';
+
+      const animationClass = `${message.role}Anim-${index}`;
+      messageElement.classList.add(animationClass);
+
+      const root = ReactDOM.createRoot(messageElement);
+
+      if (message.role === 'user') {
+        root.render(<UserMessageBox message={message.content} username={username} />);
+      } else {
+        root.render(<AiMessageBox message={message.content} />);
+      }
+
+      chatRef.current?.appendChild(messageElement);
+
+      anime({
+        targets: `.${animationClass}`,
+        opacity: [0, 1],
+        translateY: ["-50%", "0%"],
+        duration: 1000,
+        easing: "easeOutExpo",
+        complete: () => {
+          messageElement.classList.remove(animationClass);
+        }
+      });
+    });
   };
 
   const sendMessage = async () => {
@@ -87,7 +155,7 @@ function Home() {
     setMessageCount((prev) => Number(prev) + 1); // Increment messageCount for new animations
     let prompt: string | undefined = textareaRef.current?.value.trim();
     if (prompt && !isCurrentlyGenerating) {
-      if(prompt.startsWith("!!SEARCH!!")){
+      if (prompt.startsWith("!!SEARCH!!")) {
         prompt = prompt.substring("!!SEARCH!!".length).trim()
       }
 
