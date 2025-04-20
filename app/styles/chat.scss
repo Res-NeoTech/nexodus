@@ -9,38 +9,64 @@ main {
     align-items: center;
 }
 
-header{
+.notAtTheTop {
+    backdrop-filter: blur(5px);
+    transition: all 0.3s;
+}
+
+header {
     position: fixed;
     width: 100%;
     display: flex;
     flex-direction: row;
-    margin: 10px;
+    padding: 10px;
     z-index: 1;
-    justify-content: end;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s;
 
-    .headerDiv{
-        margin-right: 20px;
+    .headerDiv {
+        display: flex;
+        align-items: center;
 
-        button:first-child{
+        img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        button:first-child {
             margin-right: 10px;
         }
     }
 
-    .crudButton{
-        transition: all 0.3s;
+    input {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 25%;
+        text-align: center;
+        transition: 0.3s;
+        border-bottom: transparent 1px solid;
 
-        &:hover{
-            filter: drop-shadow(0px 0px 10px $hacker-blue-5);
-            transition: all 0.3s;
-        }
-
-        &:active{
-            filter: drop-shadow(0px 0px 10px $hacker-blue-4);
-            transition: all 0.3s;
+        &:focus {
+            outline: none;
+            border-bottom: $hacker-blue-5 1px solid;
         }
     }
 
-    .logOut{
+    .crudButton {
+        transition: all 0.3s;
+
+        &:hover {
+            filter: drop-shadow(0px 0px 10px $hacker-blue-5);
+        }
+
+        &:active {
+            filter: drop-shadow(0px 0px 10px $hacker-blue-4);
+        }
+    }
+
+    .logOut {
         margin-right: 0 !important;
     }
 }
@@ -62,11 +88,13 @@ header{
     opacity: 0;
     transform: translateY(-50%);
 
-    h1, h2 {
+    h1,
+    h2 {
         color: $hacker-blue-5;
     }
 
-    h3, h4 {
+    h3,
+    h4 {
         color: $hacker-blue-4;
     }
 
@@ -82,7 +110,8 @@ header{
             width: 100%;
         }
 
-        a, strong {
+        a,
+        strong {
             color: $hacker-blue-5;
         }
 
@@ -149,14 +178,14 @@ header{
         }
     }
 
-    .promptBoxButtons{
+    .promptBoxButtons {
         height: 25%;
         justify-content: right;
         display: flex;
         margin: 10px;
         margin-bottom: 20px;
 
-        img{
+        img {
             margin-left: auto;
             margin-right: auto;
         }
@@ -168,7 +197,7 @@ header{
             border-radius: 10px;
             transition: all 0.3s;
             margin-left: 10px;
-    
+
             &:hover {
                 cursor: pointer;
             }
@@ -181,7 +210,9 @@ header{
 }
 
 @media (min-width: 993px) and (max-width: 1200px) {
-    #chat, .messageBox {
+
+    #chat,
+    .messageBox {
         width: 75%;
     }
 }

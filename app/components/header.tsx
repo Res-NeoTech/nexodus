@@ -1,19 +1,82 @@
 'use client';
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter } from 'next/navigation'
+import { Tooltip } from 'react-tooltip';
 import ShinyText from "./ShinyText/ShinyText";
 import StarBorder from "./StarBorder/StarBorder";
+import nIcon from "../../public/favicon.png";
 
 type HeaderProps = {
     isLoggedIn: boolean;
+    chatName: string;
+    chatId: string;
 };
 
-const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
+const Header: React.FC<HeaderProps> = ({ isLoggedIn, chatName, chatId }) => {
     const router = useRouter();
+    const headerRef = useRef<HTMLElement>(null);
+    const chatNameInputRef = useRef<HTMLInputElement>(null);
+    const [currentChatName, setCurrentChatName] = useState<string>(chatName);
+    const [tooltipHint, setTooltipHint] = useState<string>("Click to edit");
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY === 0) {
+                headerRef.current?.classList.remove("notAtTheTop");
+            } else {
+                headerRef.current?.classList.add("notAtTheTop");
+            }
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        handleScroll(); // Call once to set the initial state
+
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+        };
+    }, []);
+
+    useEffect(() => {
+        setCurrentChatName(chatName);
+    }, [chatName]);
+
+    const updateName = async () => {
+        setTooltipHint("Click to edit");
+        if(chatNameInputRef.current){
+            const newChatName: string = chatNameInputRef.current.value;
+
+            if(newChatName === chatName) {
+                return; // To not bother API for nothing.
+            }
+
+            if(newChatName.length <= 0 || newChatName.length > 50) {
+                return; // Too long or empty. 
+            }
+
+            await fetch("/api/proxy/chats", {
+                method: "PUT",
+                body: JSON.stringify({ title: newChatName, id: chatId })
+            })
+        }
+    }
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            chatNameInputRef.current?.blur();
+        }
+    };
 
     if (!isLoggedIn) {
         return (
-            <header className="">
+            <header>
+                <Image src={nIcon}
+                    width={50}
+                    height={55}
+                    draggable={false}
+                    priority={true}
+                    alt="Another Logo of Nexodus" />
                 <div className="headerDiv">
                     <StarBorder
                         as="button"
@@ -38,7 +101,25 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
         );
     } else {
         return (
-            <header>
+            <header ref={headerRef} className="loggedHeader">
+                <Image src={nIcon}
+                    width={50}
+                    height={55}
+                    draggable={false}
+                    priority={true}
+                    alt="Another Logo of Nexodus" />
+                <input
+                    type="text"
+                    value={currentChatName}
+                    ref={chatNameInputRef}
+                    maxLength={50}
+                    onChange={(e) => setCurrentChatName(e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(e)}
+                    onBlur={() => updateName()}
+                    onFocus={() => setTooltipHint("Enter to confirm")}
+                    data-tooltip-id="chatTitle"
+                    data-tooltip-content={tooltipHint}
+                />
                 <div className="headerDiv">
                     <StarBorder
                         as="button"
@@ -57,6 +138,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn }) => {
                         <ShinyText text="Log Out" disabled={false} speed={5} className='buttonText' />
                     </StarBorder>
                 </div>
+                <Tooltip id="chatTitle" style={{ borderRadius: 10, backgroundColor: "black" }} />
             </header>
         );
     }

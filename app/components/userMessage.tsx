@@ -3,8 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from "rehype-sanitize";
 
 const UserMessageBox = ({ username, message }: { username: string; message: string }) => {
-    message = message.replaceAll("<", "&lt;");
-    message = message.replaceAll(">", "&gt;");
+    message = message.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
     return (
         <>
             <h1>{username}</h1>

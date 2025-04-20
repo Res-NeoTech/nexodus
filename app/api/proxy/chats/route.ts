@@ -78,3 +78,41 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Internal server error", details: String(error) }, { status: 500 });
     }
 }
+
+export async function PUT(req: Request) {
+    try {
+        const body = await req.json();
+        const id: string = body.id;
+        const title: string = body.title;
+
+        const cookieStore = await cookies();
+        const token = cookieStore.get("token");
+
+        if (!token) {
+            return NextResponse.json({ error: "Token not found" }, { status: 401 });
+        }
+
+        if(title.length <= 0 || title.length > 50) { //Forgot to add the filtration on the ASP.NET backend, so doing it here.
+            return NextResponse.json({ error: "Incorrect title length." }, { status: 400 });
+        }
+
+        const request = await fetch(`${API_URL}/chats/chat`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "x-nexodus-token": `Nexodus ${token.value}`
+            },
+            body: JSON.stringify({ id, title })
+        });
+
+        if (request.status !== 200) {
+            const result = await request.text();
+            return NextResponse.json({ error: result }, { status: request.status });
+        }
+
+        return NextResponse.json({ result: "Chat title was changed successfully!" }, { status: 200 })
+    } catch (error) {
+        console.error("Proxy error:", error);
+        return NextResponse.json({ error: "Internal server error", details: String(error) }, { status: 500 });
+    }
+}

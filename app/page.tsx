@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from 'next/navigation';
 import ReactDOM from "react-dom/client";
@@ -36,6 +36,7 @@ function Home() {
   const [messageState, setMessageState] = useState<string>("Send");
   const [username, setUsername] = useState<string>("You");
   const [currentChatId, setCurrentChatId] = useState<string>("NONE");
+  const [currentChatName, setCurrentChatName] = useState<string>("New Chat");
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -79,6 +80,7 @@ function Home() {
 
           if (Array.isArray(data.result.messages)) {
             setMessages(data.result.messages);
+            setCurrentChatName(data.result.title);
             setIsHistoryFetched(true);
           }
         }
@@ -438,8 +440,8 @@ function Home() {
   };
 
   return (
-    <>
-      <Header isLoggedIn={username !== "You"} />
+    <Suspense>
+      <Header isLoggedIn={username !== "You"} chatName={currentChatName} chatId={currentChatId} />
       <main>
         <Squares
           speed={0.5}
@@ -474,7 +476,7 @@ function Home() {
           </div>
         </article>
       </main>
-    </>
+    </Suspense>
   );
 }
 
