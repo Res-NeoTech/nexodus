@@ -440,7 +440,7 @@ function Home() {
   };
 
   return (
-    <Suspense>
+    <Suspense fallback={<></>}> {/* To make sure Next.js don't bark during the build. */}
       <Header isLoggedIn={username !== "You"} chatName={currentChatName} chatId={currentChatId} />
       <main>
         <Squares
