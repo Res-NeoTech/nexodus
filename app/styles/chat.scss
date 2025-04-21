@@ -71,6 +71,20 @@ header {
     }
 }
 
+#chatList{
+    display: none;
+    position: fixed;
+    z-index: 2;
+    backdrop-filter: blur(5px);
+    width: 100%;
+    height: 100%;
+
+    h1{
+        text-align: center;
+        margin-top: 30px;
+    }
+}
+
 #chat {
     width: 50%;
     display: flex;

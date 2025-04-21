@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from 'next/navigation'
@@ -30,7 +30,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, chatName, chatId }) => {
         };
 
         window.addEventListener("scroll", handleScroll);
-        handleScroll(); // Call once to set the initial state
+        handleScroll();
 
         return () => {
             window.removeEventListener("scroll", handleScroll);
@@ -43,14 +43,14 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, chatName, chatId }) => {
 
     const updateName = async () => {
         setTooltipHint("Click to edit");
-        if(chatNameInputRef.current){
-            const newChatName: string = chatNameInputRef.current.value;
+        if (chatNameInputRef.current) {
+            const newChatName: string = chatNameInputRef.current.value.trim();
 
-            if(newChatName === chatName) {
+            if (newChatName === chatName) {
                 return; // To not bother API for nothing.
             }
 
-            if(newChatName.length <= 0 || newChatName.length > 50) {
+            if (newChatName.length <= 0 || newChatName.length > 50) {
                 return; // Too long or empty. 
             }
 
@@ -102,13 +102,23 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, chatName, chatId }) => {
     } else {
         return (
             <header ref={headerRef} className="loggedHeader">
-                <Image src={nIcon}
-                    width={50}
-                    height={55}
-                    draggable={false}
-                    priority={true}
-                    alt="Another Logo of Nexodus" />
-                <input
+                <div className="headerDiv">
+                    <StarBorder
+                        as="button"
+                        className="crudButton logOut"
+                        color="#21A698"
+                        speed="5s"
+                        onClick={() => {
+                            const chatListElement = document.getElementById("chatList");
+                            if (chatListElement) {
+                                chatListElement.style.display = "block";
+                            }
+                        }}
+                    >
+                        <ShinyText text="Chats" disabled={false} speed={5} className='buttonText' />
+                    </StarBorder>
+                </div>
+                {chatId !== "NONE" ? <input
                     type="text"
                     value={currentChatName}
                     ref={chatNameInputRef}
@@ -119,7 +129,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, chatName, chatId }) => {
                     onFocus={() => setTooltipHint("Enter to confirm")}
                     data-tooltip-id="chatTitle"
                     data-tooltip-content={tooltipHint}
-                />
+                /> : <></>}
                 <div className="headerDiv">
                     <StarBorder
                         as="button"

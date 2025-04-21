@@ -7,15 +7,16 @@ import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import anime from "animejs";
 
-import UserMessageBox from "./components/userMessage";
-import AiMessageBox from "./components/aiMessage";
-import Header from "./components/header";
+import UserMessageBox from "./components/UserMessage";
+import AiMessageBox from "./components/AiMessage";
+import Header from "./components/Header";
+import ChatList from "./components/ChatList";
 
 import "./styles/chat.scss";
 import nexodusImage from "../public/nexodus.png";
 import sendIcon from "../public/send.png";
 import stopIcon from "../public/stop.png";
-import CheckboxSearch from "./components/chkSearch";
+import CheckboxSearch from "./components/CheckSearch";
 import Squares from './components/Squares/Squares';
 
 function Home() {
@@ -120,7 +121,7 @@ function Home() {
 
   const renderHistoryMessages = (historyMessages: { role: string; content: string; }[]) => {
     historyMessages.forEach((message, index) => {
-      if(message.role === "user" && message.content.startsWith("!!SEARCH!!")) { // Do not render this message because this user prompt is techical for search function.
+      if (message.role === "user" && message.content.startsWith("!!SEARCH!!")) { // Do not render this message because this user prompt is techical for search function.
         return;
       }
       const messageElement = document.createElement('section');
@@ -440,7 +441,7 @@ function Home() {
   };
 
   return (
-    <Suspense fallback={<></>}> {/* To make sure Next.js don't bark during the build. */}
+    <>
       <Header isLoggedIn={username !== "You"} chatName={currentChatName} chatId={currentChatId} />
       <main>
         <Squares
@@ -475,8 +476,9 @@ function Home() {
             <Tooltip id="messageControl" style={{ borderRadius: 10, backgroundColor: "black" }} />
           </div>
         </article>
+        <ChatList />
       </main>
-    </Suspense>
+    </>
   );
 }
 

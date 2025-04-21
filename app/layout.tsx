@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react"
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
 import "./styles/globals.css";
 
 const geistSans = Geist({
@@ -31,9 +32,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Suspense fallback={<h1>Loading, please stand by...</h1>}>
+          {children}
+        </Suspense>
       </body>
-      <Analytics/>
+      <Analytics />
     </html>
   );
 }
