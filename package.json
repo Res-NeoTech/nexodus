@@ -1,6 +1,6 @@
 {
   "name": "nexodus",
-  "version": "1.0.0",
+  "version": "0.9.1",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",

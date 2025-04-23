@@ -40,7 +40,7 @@ function ChatList() {
                 items={itemNames}
                 onItemSelect={(_, index) => {
                     const selectedItem = apiItems[index];
-                    window.location.href = "http://localhost:3000?chatId=" + selectedItem.id;
+                    window.location.href = "https://nexodus.maksym.ch?chatId=" + selectedItem.id;
                 }}
                 showGradients={true}
                 enableArrowNavigation={true}

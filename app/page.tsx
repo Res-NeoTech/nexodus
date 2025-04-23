@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState, useEffect, Suspense } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from 'next/navigation';
 import ReactDOM from "react-dom/client";
@@ -90,7 +90,6 @@ function Home() {
 
     getUser();
     getChat();
-
   }, []);
 
   useEffect(() => {

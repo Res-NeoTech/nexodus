@@ -61,6 +61,16 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, chatName, chatId }) => {
         }
     }
 
+    const deleteChat = async () => {
+        const deleteChatRequest = await fetch("/api/proxy/chats?id=" + chatId, {
+            method: "DELETE"
+        })
+
+        if(deleteChatRequest.status === 200) {
+            window.location.href = "https://nexodus.maksym.ch"
+        }
+    }
+
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
             event.preventDefault();
@@ -102,10 +112,10 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, chatName, chatId }) => {
     } else {
         return (
             <header ref={headerRef} className="loggedHeader">
-                <div className="headerDiv">
+                <div className="headerDiv leftHeaderDiv">
                     <StarBorder
                         as="button"
-                        className="crudButton logOut"
+                        className="crudButton chats"
                         color="#21A698"
                         speed="5s"
                         onClick={() => {
@@ -117,6 +127,15 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, chatName, chatId }) => {
                     >
                         <ShinyText text="Chats" disabled={false} speed={5} className='buttonText' />
                     </StarBorder>
+                    {chatId !== "NONE" ? <StarBorder
+                        as="button"
+                        className="crudButton delete"
+                        color="#21A698"
+                        speed="5s"
+                        onClick={() => deleteChat()}
+                    >
+                        <ShinyText text="Delete" disabled={false} speed={5} className='buttonText' />
+                    </StarBorder> : <></>}
                 </div>
                 {chatId !== "NONE" ? <input
                     type="text"

@@ -50,10 +50,12 @@
     background-color: black;
     border-radius: 10px;
     margin-bottom: 1rem;
+    transition: all 0.3s;
 }
 
 .item.selected {
     background-color: #21A698;
+    transition: all 0.3s;
 }
 
 .item-text {
