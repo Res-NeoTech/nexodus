@@ -7,9 +7,9 @@ import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import anime from "animejs";
 
-import UserMessageBox from "./components/UserMessage";
-import AiMessageBox from "./components/AiMessage";
-import Header from "./components/Header";
+import UserMessageBox from "./components/userMessage";
+import AiMessageBox from "./components/aiMessage";
+import Header from "./components/header";
 import ChatList from "./components/ChatList";
 
 import "./styles/chat.scss";
