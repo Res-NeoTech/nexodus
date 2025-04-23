@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter, useSearchParams } from 'next/navigation';
 import ReactDOM from "react-dom/client";
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
@@ -8,13 +9,14 @@ import anime from "animejs";
 
 import UserMessageBox from "./components/userMessage";
 import AiMessageBox from "./components/aiMessage";
+import Header from "./components/header";
+import ChatList from "./components/ChatList";
 
 import "./styles/chat.scss";
-import 'react-tooltip/dist/react-tooltip.css'
 import nexodusImage from "../public/nexodus.png";
 import sendIcon from "../public/send.png";
 import stopIcon from "../public/stop.png";
-import CheckboxSearch from "./components/chkSearch";
+import CheckboxSearch from "./components/CheckSearch";
 import Squares from './components/Squares/Squares';
 
 function Home() {
@@ -33,7 +35,15 @@ function Home() {
   const [isOnlineSearch, setIsOnlineSearch] = useState<boolean>(false);
   const [messageIcon, setMessageIcon] = useState<typeof sendIcon>(sendIcon);
   const [messageState, setMessageState] = useState<string>("Send");
+  const [username, setUsername] = useState<string>("You");
+  const [currentChatId, setCurrentChatId] = useState<string>("NONE");
+  const [currentChatName, setCurrentChatName] = useState<string>("New Chat");
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const chatId = searchParams.get('chatId');
+  const [hasRenderedInitialMessages, setHasRenderedInitialMessages] = useState(false);
+  const [isHistoryFetched, setIsHistoryFetched] = useState<boolean>(false);
 
   // useEffect here to check if user prefer to be scrolled automatically while AI generates a response.
   useEffect(() => {
@@ -52,14 +62,104 @@ function Home() {
   }, []);
 
   useEffect(() => {
+    const getUser = async () => {
+      const request = await fetch("/api/proxy/crud");
+      const data = await request.json();
+
+      if (request.status === 200) {
+        setUsername(data.result.name);
+      }
+    };
+
+    const getChat = async () => {
+      if (chatId) {
+        const getChatRequest = await fetch("/api/proxy/chats?id=" + chatId);
+
+        if (getChatRequest.status === 200) {
+          setCurrentChatId(chatId);
+          const data = await getChatRequest.json();
+
+          if (Array.isArray(data.result.messages)) {
+            setMessages(data.result.messages);
+            setCurrentChatName(data.result.title);
+            setIsHistoryFetched(true);
+          }
+        }
+      }
+    }
+
+    getUser();
+    getChat();
+  }, []);
+
+  useEffect(() => {
+    if (messages && isHistoryFetched && !hasRenderedInitialMessages) {
+      renderHistoryMessages(messages);
+      setHasRenderedInitialMessages(true);
+      setIsFirstMessage(false);
+      greetingRef.current?.remove();
+      if (chatRef.current) {
+        chatRef.current.style.marginBottom = "0px";
+      }
+    }
+  }, [isHistoryFetched, hasRenderedInitialMessages]);
+
+  useEffect(() => {
+    if (currentChatId !== "NONE") {
+      setChatIdParam(currentChatId)
+    }
+  }, [currentChatId])
+
+  useEffect(() => {
     preferBottomRef.current = preferBottom;
   }, [preferBottom]);
+
+  const setChatIdParam = (chatId: string) => {
+    router.push(`/?chatId=${chatId}`); //pushing chatId to url
+  };
+
+  const renderHistoryMessages = (historyMessages: { role: string; content: string; }[]) => {
+    historyMessages.forEach((message, index) => {
+      if (message.role === "user" && message.content.startsWith("!!SEARCH!!")) { // Do not render this message because this user prompt is techical for search function.
+        return;
+      }
+      const messageElement = document.createElement('section');
+      messageElement.className = message.role === 'user' ? 'userMessage' : 'aiMessage';
+
+      const animationClass = `${message.role}Anim-${index}`;
+      messageElement.classList.add(animationClass);
+
+      const root = ReactDOM.createRoot(messageElement);
+
+      if (message.role === 'user') {
+        root.render(<UserMessageBox message={message.content} username={username} />);
+      } else {
+        root.render(<AiMessageBox message={message.content} />);
+      }
+
+      chatRef.current?.appendChild(messageElement);
+
+      anime({
+        targets: `.${animationClass}`,
+        opacity: [0, 1],
+        translateY: ["-50%", "0%"],
+        duration: 1000,
+        easing: "easeOutExpo",
+        complete: () => {
+          messageElement.classList.remove(animationClass);
+        }
+      });
+    });
+  };
 
   const sendMessage = async () => {
     setStopGenerate(false); // Reset stopGenerate to false at the start
     setMessageCount((prev) => Number(prev) + 1); // Increment messageCount for new animations
-    const prompt: string | undefined = textareaRef.current?.value.trim();
+    let prompt: string | undefined = textareaRef.current?.value.trim();
     if (prompt && !isCurrentlyGenerating) {
+      if (prompt.startsWith("!!SEARCH!!")) {
+        prompt = prompt.substring("!!SEARCH!!".length).trim()
+      }
 
       if (isFirstMessage) {
         setIsFirstMessage(false);
@@ -81,7 +181,7 @@ function Home() {
       userMessageElement.className = 'userMessage';
       userMessageElement.classList.add("userAnim-" + messageCount);
       const root = ReactDOM.createRoot(userMessageElement);
-      root.render(<UserMessageBox message={prompt} />);
+      root.render(<UserMessageBox message={prompt} username={username} />);
       chatRef.current?.appendChild(userMessageElement);
       anime({
         targets: ".userAnim-" + messageCount,
@@ -91,7 +191,7 @@ function Home() {
         easing: "easeOutExpo"
       });
       setIsCurrentlyGenerating(true);
-      callMistralAPI(prompt);
+      callMistralAPI(prompt)
     }
   }
 
@@ -128,7 +228,7 @@ function Home() {
    */
   const callMistralAPI = async (prompt: string): Promise<string | null> => {
     const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
-    const API_URL = "https://api.mistral.ai/v1/chat/completions";
+    const API_URL: string = "https://api.mistral.ai/v1/chat/completions";
 
     if (!API_KEY) {
       console.error("API Key is missing");
@@ -139,6 +239,27 @@ function Home() {
 
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
+    let chatId: string = currentChatId;
+
+    if (isFirstMessage) {
+      const createChatRequest = await fetch("/api/proxy/chats", {
+        method: "POST",
+        body: JSON.stringify({ role: "user", content: prompt })
+      });
+
+      if (createChatRequest.status === 201) {
+        const data = await createChatRequest.json();
+        chatId = data.result.id;
+        setCurrentChatId(chatId);
+      }
+    } else {
+      fetch("/api/proxy/chats/append?id=" + chatId, {
+        method: "PUT",
+        body: JSON.stringify({ role: "user", content: prompt })
+      })
+    }
+
+    let aiResponse = "";
 
     try {
       let systemMessage = "";
@@ -173,7 +294,7 @@ function Home() {
           .join("\n") || "No relevant information found.";
 
         // Step 4: Construct the system message with Google results
-        systemMessage = `Based on recent search results, here is relevant information:\n\n${googleSummary}\n\nNow answer the user's question accurately, and take conscious about the previous message.`;
+        systemMessage = `!!SEARCH!! Based on recent search results, here is relevant information:\n\n${googleSummary}\n\nNow answer the user's question accurately, and take conscious about the previous message.`;
         console.log("Google Search Results:", resultsArray);
       }
 
@@ -181,6 +302,14 @@ function Home() {
         setIsCurrentlyGenerating(false);
         return null;
       }
+
+      if (isOnlineSearch) {
+        await fetch("/api/proxy/chats/append?id=" + chatId, {
+          method: "PUT",
+          body: JSON.stringify({ role: "user", content: systemMessage })
+        });
+      }
+
       // Step 4: Prepare messages for Mistral AI
       const updatedMessages = [
         ...(messages || []),
@@ -218,7 +347,6 @@ function Home() {
       // Step 6: Process Streaming Response
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let aiResponse = "";
 
       const aiMessageElement = document.createElement("section");
       aiMessageElement.className = "aiMessage";
@@ -246,20 +374,13 @@ function Home() {
           } else {
             updatedMessages[updatedMessages.length - 1].content = aiResponse;
           }
-
-          setMessages([...updatedMessages]); // Update state
+          setMessages([...updatedMessages]);
         }
       };
 
       while (true) {
         const { value, done } = await reader.read();
-        if (stopGenerate) {
-          setStopGenerate(false);
-          break;
-        }
-        if (preferBottomRef.current) {
-          window.scrollTo(0, document.documentElement.scrollHeight);
-        }
+
         if (done) break;
 
         const chunk = decoder.decode(value, { stream: true });
@@ -267,7 +388,6 @@ function Home() {
 
         for (const line of lines) {
           if (line.trim() === "[DONE]") {
-            // Ignore and break when reaching the end of stream
             break;
           }
           if (!line.startsWith("data:")) continue;
@@ -287,16 +407,33 @@ function Home() {
         }
       }
 
+      // Save the final message to the database
+      await fetch("/api/proxy/chats/append?id=" + chatId, {
+        method: "PUT",
+        body: JSON.stringify({ role: "assistant", content: aiResponse })
+      });
+
       setMessages([...updatedMessages]);
       setMessageCount((prev) => Number(prev) + 1);
       setIsCurrentlyGenerating(false);
+
       if (sendButtonRef.current) {
         setMessageIcon(sendIcon);
         setMessageState("Send");
       }
-      return null;
+
+      return aiResponse;
     } catch (err) {
       console.error("Request error: ", err);
+
+      // Save the partial message to the database if generation is aborted
+      if (abortControllerRef.current?.signal.aborted) {
+        await fetch("/api/proxy/chats/append?id=" + chatId, {
+          method: "PUT",
+          body: JSON.stringify({ role: "assistant", content: aiResponse })
+        });
+      }
+
       setIsCurrentlyGenerating(false);
       return null;
     }
@@ -304,6 +441,7 @@ function Home() {
 
   return (
     <>
+      <Header isLoggedIn={username !== "You"} chatName={currentChatName} chatId={currentChatId} />
       <main>
         <Squares
           speed={0.5}
@@ -318,6 +456,7 @@ function Home() {
               width={400}
               height={400}
               draggable={false}
+              priority={true}
               alt="Logo of Nexodus" />
             <h5>Type a prompt below to start chatting.</h5>
           </div>
@@ -333,9 +472,10 @@ function Home() {
                 draggable={false}
                 alt="Send Icon" />
             </button>
-            <Tooltip id="messageControl" style={{ borderRadius: 10, backgroundColor: "black" }}/>
+            <Tooltip id="messageControl" style={{ borderRadius: 10, backgroundColor: "black" }} />
           </div>
         </article>
+        <ChatList />
       </main>
     </>
   );

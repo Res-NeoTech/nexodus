@@ -1,12 +1,14 @@
 import React from "react";
 import ReactMarkdown from 'react-markdown';
+import rehypeSanitize from "rehype-sanitize";
 
-const UserMessageBox = ({ message }: { message: string }) => {
+const UserMessageBox = ({ username, message }: { username: string; message: string }) => {
+    message = message.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
     return (
         <>
-            <h1>You</h1>
+            <h1>{username}</h1>
             <div>
-                <ReactMarkdown>{message}</ReactMarkdown>
+                <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{message}</ReactMarkdown>
             </div>
         </>
     );

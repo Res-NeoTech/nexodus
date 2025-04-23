@@ -1,0 +1,74 @@
+$promptBox: #131313;
+$hacker-blue-4: #147373;
+$hacker-blue-5: #21A698;
+
+img{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.heading{
+    margin-bottom: 100px;
+    text-align: center;
+}
+
+form{
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 10px;
+    width: 30%;
+    padding: 0.5%;
+    background-color: $promptBox;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: rgba(167, 167, 167, 0.1) 0px 0px 20px 0px;
+
+    input, label{
+        margin: 2.5%;
+        width: 95%;
+    }
+
+    label{
+        margin-bottom: 0;
+    }
+
+    input{
+        background-color: #0c0c0c;
+        padding: 5px;
+        height: 40px;
+        border-radius: 10px;
+
+        &:focus {
+            outline: 3px solid $hacker-blue-4;
+        }
+    }
+
+    .error{
+        width: 95%;
+        color: crimson;
+    }
+
+    button{
+        margin-top: 15px;
+        width: 50%;
+        transition: 0.3s all;
+        margin-bottom: 15px;
+
+        &:hover{
+            transition: 0.3s all;
+            width: 95%;
+        }
+
+        &:active{
+            transition: 0.3s all;
+            transform: scale(0.95);
+        }
+    }
+}
+
+@media (max-width: 992px) {
+    form{
+        width: 90%;
+    }
+}

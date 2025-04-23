@@ -2,6 +2,7 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
+import rehypeSanitize from "rehype-sanitize";
 
 const AiMessageBox = ({ message }: { message: string }) => {
     return (
@@ -9,6 +10,7 @@ const AiMessageBox = ({ message }: { message: string }) => {
             <h1>Mistral AI</h1>
             <div className="aiMessageContent">
                 <ReactMarkdown
+                    rehypePlugins={[rehypeSanitize]}
                     components={{
                         code({inline, className, children, ...props }: {inline?: boolean, className?: string, children?: React.ReactNode }) {
                             const match = /language-(\w+)/.exec(className || "");
@@ -29,7 +31,7 @@ const AiMessageBox = ({ message }: { message: string }) => {
                         },
                     }}
                 >
-                    {message}
+                    {(message)}
                 </ReactMarkdown>
             </div>
         </>
