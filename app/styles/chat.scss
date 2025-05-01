@@ -72,7 +72,6 @@ header {
 }
 
 #chatList {
-    display: none;
     position: fixed;
     z-index: 2;
     backdrop-filter: blur(5px);
@@ -132,6 +131,22 @@ header {
         section {
             overflow-x: scroll;
             background-color: $promptBox !important;
+
+            &::-webkit-scrollbar {
+                width: 8px;
+            }
+            
+            &::-webkit-scrollbar-track {
+                background: rgb(36, 36, 36);
+                border-bottom-left-radius: 10px;
+                border-bottom-right-radius: 10px;
+            }
+            
+            &::-webkit-scrollbar-thumb {
+                background: #21A698;
+                border-bottom-left-radius: 10px;
+                border-bottom-right-radius: 10px;
+            }
         }
 
         hr {

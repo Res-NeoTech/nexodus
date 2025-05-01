@@ -16,6 +16,7 @@ import "./styles/chat.scss";
 import nexodusImage from "../public/nexodus.png";
 import sendIcon from "../public/send.png";
 import stopIcon from "../public/stop.png";
+import plusIcon from "../public/plus.png";
 import CheckboxSearch from "./components/CheckSearch";
 import Squares from './components/Squares/Squares';
 
@@ -150,6 +151,10 @@ function Home() {
         }
       });
     });
+
+    setTimeout(() => {
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
+    }, 500);
   };
 
   const sendMessage = async () => {
@@ -253,72 +258,72 @@ function Home() {
         setCurrentChatId(chatId);
       }
     } else {
-      fetch("/api/proxy/chats/append?id=" + chatId, {
+      await fetch("/api/proxy/chats/append?id=" + chatId, {
         method: "PUT",
         body: JSON.stringify({ role: "user", content: prompt })
       })
     }
 
     let aiResponse = "";
+    let systemMessage = "";
 
-    try {
-      let systemMessage = "";
-      if (isOnlineSearch) {
-        // Step 1: Retrieve Google Search Results
-        const googleResults = await fetch(`/api/search-brave?q=${encodeURIComponent(prompt)}`, {
-          signal: abortController.signal, // Attach the AbortController signal
+    if (isOnlineSearch) {
+      // Step 1: Retrieve Google Search Results
+      const googleResults = await fetch(`/api/search-brave?q=${encodeURIComponent(prompt)}`, {
+        signal: abortController.signal, // Attach the AbortController signal
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error(`Status ${res.status}`);
+          return res.json();
         })
-          .then((res) => {
-            if (!res.ok) throw new Error(`Status ${res.status}`);
-            return res.json();
-          })
-          .catch((err) => {
-            if (abortController.signal.aborted) {
-              return null;
-            }
-            console.error("Error during Brave search:", err);
+        .catch((err) => {
+          if (abortController.signal.aborted) {
             return null;
-          });
-
-        if (stopGenerate || !googleResults) {
-          setIsCurrentlyGenerating(false);
+          }
+          console.error("Error during Brave search:", err);
           return null;
-        }
+        });
 
-        const resultsArray = Array.isArray(googleResults?.results) ? googleResults.results : [];
-
-        // Step 3: Extract meaningful snippets from search results
-        const googleSummary = resultsArray
-          .slice(0, 3)
-          .map((result: { title: string; description: string }) => `- ${result.title}: ${result.description}`)
-          .join("\n") || "No relevant information found.";
-
-        // Step 4: Construct the system message with Google results
-        systemMessage = `!!SEARCH!! Based on recent search results, here is relevant information:\n\n${googleSummary}\n\nNow answer the user's question accurately, and take conscious about the previous message.`;
-        console.log("Google Search Results:", resultsArray);
-      }
-
-      if (stopGenerate) {
+      if (stopGenerate || !googleResults) {
         setIsCurrentlyGenerating(false);
         return null;
       }
 
-      if (isOnlineSearch) {
-        await fetch("/api/proxy/chats/append?id=" + chatId, {
-          method: "PUT",
-          body: JSON.stringify({ role: "user", content: systemMessage })
-        });
-      }
+      const resultsArray = Array.isArray(googleResults?.results) ? googleResults.results : [];
 
-      // Step 4: Prepare messages for Mistral AI
-      const updatedMessages = [
-        ...(messages || []),
-        ...(isOnlineSearch ? [{ role: "user", content: systemMessage }] : []),
-        { role: "user", content: prompt }
-      ];
+      // Step 3: Extract meaningful snippets from search results
+      const googleSummary = resultsArray
+        .slice(0, 3)
+        .map((result: { title: string; description: string }) => `- ${result.title}: ${result.description}`)
+        .join("\n") || "No relevant information found.";
 
-      setMessages(updatedMessages);
+      // Step 4: Construct the system message with Google results
+      systemMessage = `!!SEARCH!! Based on recent search results, here is relevant information:\n\n${googleSummary}\n\nNow answer the user's question accurately, and take conscious about the previous message.`;
+      console.log("Google Search Results:", resultsArray);
+    }
 
+    if (stopGenerate) {
+      setIsCurrentlyGenerating(false);
+      return null;
+    }
+
+    if (isOnlineSearch) {
+      await fetch("/api/proxy/chats/append?id=" + chatId, {
+        method: "PUT",
+        body: JSON.stringify({ role: "user", content: systemMessage })
+      });
+    }
+
+    // Step 4: Prepare messages for Mistral AI
+    const updatedMessages = [
+      ...(messages || []),
+      ...(isOnlineSearch ? [{ role: "user", content: systemMessage }] : []),
+      { role: "user", content: prompt }
+    ];
+
+    setMessages(updatedMessages);
+
+    try {
       // Step 5: Call Mistral AI API
       const body = JSON.stringify({
         model: "mistral-small-latest",
@@ -413,6 +418,26 @@ function Home() {
         body: JSON.stringify({ role: "assistant", content: aiResponse })
       });
 
+      //Generate a chatName for this conversation.
+      if (isFirstMessage) {
+        const request = await fetch("/api/generate-chat-name", {
+          method: "POST",
+          body: JSON.stringify({ messages: updatedMessages })
+        });
+
+        if (request.status === 200) {
+          const data = await request.json();
+
+          const updateChatNameRequest = await fetch("/api/proxy/chats", {
+            method: "PUT",
+            body: JSON.stringify({ title: data.chatName, id: chatId })
+          })
+
+          if (updateChatNameRequest.status === 200) {
+            setCurrentChatName(data.chatName); // Set the chat name only if it's successfully saved, to make sure there is no incoherence.
+          }
+        }
+      }
       setMessages([...updatedMessages]);
       setMessageCount((prev) => Number(prev) + 1);
       setIsCurrentlyGenerating(false);
@@ -426,15 +451,39 @@ function Home() {
     } catch (err) {
       console.error("Request error: ", err);
 
-      // Save the partial message to the database if generation is aborted
-      if (abortControllerRef.current?.signal.aborted) {
-        await fetch("/api/proxy/chats/append?id=" + chatId, {
-          method: "PUT",
-          body: JSON.stringify({ role: "assistant", content: aiResponse })
-        });
-      }
+      if (aiResponse.trim().length > 0) {
+        // Save the partial message to the database if generation is aborted
+        if (abortControllerRef.current?.signal.aborted) {
+          await fetch("/api/proxy/chats/append?id=" + chatId, {
+            method: "PUT",
+            body: JSON.stringify({ role: "assistant", content: aiResponse })
+          });
+        }
 
-      setIsCurrentlyGenerating(false);
+        setMessages([...updatedMessages]);
+
+        if (isFirstMessage) {
+          const request = await fetch("/api/generate-chat-name", {
+            method: "POST",
+            body: JSON.stringify({ messages: updatedMessages })
+          });
+
+          if (request.status === 200) {
+            const data = await request.json();
+
+            const updateChatNameRequest = await fetch("/api/proxy/chats", {
+              method: "PUT",
+              body: JSON.stringify({ title: data.chatName, id: chatId })
+            });
+
+            if (updateChatNameRequest.status === 200) {
+              setCurrentChatName(data.chatName);
+            }
+          }
+        }
+
+        setIsCurrentlyGenerating(false);
+      }
       return null;
     }
   };
@@ -464,15 +513,22 @@ function Home() {
         <article className="messageBox">
           <textarea name="promptArea" id="promptArea" onKeyDown={handleKeyDown} placeholder="Type a prompt..." ref={textareaRef}></textarea>
           <div className="promptBoxButtons">
+            <button data-tooltip-id="promptBoxTooltip" data-tooltip-content={"New Chat"} onClick={() => { window.location.href=`${process.env.NEXT_PUBLIC_BASE_URL}` }}>
+              <Image src={plusIcon}
+                width={32}
+                height={32}
+                draggable={false}
+                alt="New Chat Icon" />
+            </button>
             <CheckboxSearch checked={isOnlineSearch} setChecked={setIsOnlineSearch} />
-            <button data-tooltip-id="messageControl" data-tooltip-content={messageState} onClick={handleButton} ref={sendButtonRef}>
+            <button data-tooltip-id="promptBoxTooltip" data-tooltip-content={messageState} onClick={handleButton} ref={sendButtonRef}>
               <Image src={messageIcon}
                 width={32}
                 height={32}
                 draggable={false}
                 alt="Send Icon" />
             </button>
-            <Tooltip id="messageControl" style={{ borderRadius: 10, backgroundColor: "black" }} />
+            <Tooltip id="promptBoxTooltip" style={{ borderRadius: 10, backgroundColor: "black" }} />
           </div>
         </article>
         <ChatList />

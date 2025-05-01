@@ -7,9 +7,8 @@ const getAllChats = async () => {
         method: "GET"
     });
 
-    if(getAllChatsRequest.status === 200) {
+    if (getAllChatsRequest.status === 200) {
         const data = await getAllChatsRequest.json();
-
         return data.result;
     }
 
@@ -22,25 +21,37 @@ function ChatList() {
     useEffect(() => {
         const fetchChats = async () => {
             const chats = await getAllChats();
+            chats.unshift({ title: "Start a new chat", id: "NEW" });
             setApiItems(chats);
         };
         fetchChats();
     }, []);
 
     const itemNames = apiItems.map((item) => item.title);
+
     return (
-        <section id='chatList' onClick={() => {
-            const chatListElement = document.getElementById("chatList");
-            if (chatListElement) {
-                chatListElement.style.display = "none";
-            }
-        }}>
+        <section
+            id='chatList'
+            hidden={true}
+            onClick={() => {
+                const chatListElement = document.getElementById("chatList");
+                if (chatListElement) {
+                    chatListElement.hidden = true;
+                }
+            }}
+        >
             <h1>Select Chat</h1>
             <AnimatedList
                 items={itemNames}
                 onItemSelect={(_, index) => {
-                    const selectedItem = apiItems[index];
-                    window.location.href = "https://nexodus.maksym.ch?chatId=" + selectedItem.id;
+                    if (!document.getElementById("chatList")?.hidden) {
+                        const selectedItem = apiItems[index];
+                        if(selectedItem.id === "NEW") {
+                            window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}`;
+                        } else {
+                            window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}?chatId=${selectedItem.id}`;
+                        }
+                    }
                 }}
                 showGradients={true}
                 enableArrowNavigation={true}

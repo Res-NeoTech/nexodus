@@ -15,11 +15,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nexodus",
-  description: "Nexodus - a free AI chat using Mistral.",
+  description: "Nexodus is a free AI chat platform powered by Mistral, designed to provide intelligent and engaging conversations. Whether you need assistance with daily tasks, want to explore new ideas, or simply enjoy a friendly chat, Nexodus is here to help. Experience the future of communication with our state-of-the-art AI technology.",
   icons: {
     icon: "/favicon.png?v=1",
   },
+  keywords: [
+    "AI chat",
+    "Mistral AI",
+    "free chatbot",
+    "intelligent conversations",
+    "AI assistant",
+    "chat with AI",
+    "Nexodus chat",
+    "AI communication",
+    "smart chatbot",
+    "AI-powered chat",
+    "Nexodus"
+  ],
+  authors: [{ name: "Maksym (aka NeoTech)", url: "https://maksym.ch" }, { name: "FauZa", url: "https://fauza.fr" }, { name: "Mistral AI", url: "https://mistral.ai" }],
 };
 
 export default function RootLayout({
@@ -32,7 +45,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Suspense fallback={<h1>Loading, please stand by...</h1>}>
+        <Suspense fallback={<></>}>
           {children}
         </Suspense>
       </body>

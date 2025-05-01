@@ -38,6 +38,10 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, chatName, chatId }) => {
     }, []);
 
     useEffect(() => {
+        document.title = `${currentChatName} | Nexodus`;
+    }, [currentChatName]);
+
+    useEffect(() => {
         setCurrentChatName(chatName);
     }, [chatName]);
 
@@ -67,7 +71,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, chatName, chatId }) => {
         })
 
         if(deleteChatRequest.status === 200) {
-            window.location.href = "https://nexodus.maksym.ch"
+            window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}`;
         }
     }
 
@@ -121,7 +125,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, chatName, chatId }) => {
                         onClick={() => {
                             const chatListElement = document.getElementById("chatList");
                             if (chatListElement) {
-                                chatListElement.style.display = "block";
+                                chatListElement.hidden = false;
                             }
                         }}
                     >
