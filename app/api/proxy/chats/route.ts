@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { encodeToBase64 } from "@/app/utils/cryptography";
 
+const PROXY_TOKEN: string | undefined = process.env.PROXY_TOKEN;
 const API_URL: string = process.env.NODE_ENV === "production" ? "https://nexapi.maksym.ch" : "http://localhost:5125";
 
 if(process.env.NODE_ENV !== "production") {
@@ -22,7 +24,8 @@ export async function GET(req :Request) {
         const request = await fetch(`${API_URL}/chats/chat?id=${id}`, {
             method: "GET",
             headers: {
-                "x-nexodus-token": `Nexodus ${token.value}`
+                "x-nexodus-token": `Nexodus ${token.value}`,
+                "x-nexodus-proxy": encodeToBase64(PROXY_TOKEN)
             }
         })
 
@@ -57,7 +60,8 @@ export async function POST(req: Request) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "x-nexodus-token": `Nexodus ${token.value}`
+                "x-nexodus-token": `Nexodus ${token.value}`,
+                "x-nexodus-proxy": encodeToBase64(PROXY_TOKEN)
             },
             body: JSON.stringify({ role, content })
         });
@@ -95,15 +99,12 @@ export async function PUT(req: Request) {
             return NextResponse.json({ error: "Token not found" }, { status: 401 });
         }
 
-        if(title.length <= 0 || title.length > 50) { //Forgot to add the filtration on the ASP.NET backend, so doing it here.
-            return NextResponse.json({ error: "Incorrect title length." }, { status: 400 });
-        }
-
         const request = await fetch(`${API_URL}/chats/chat`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                "x-nexodus-token": `Nexodus ${token.value}`
+                "x-nexodus-token": `Nexodus ${token.value}`,
+                "x-nexodus-proxy": encodeToBase64(PROXY_TOKEN)
             },
             body: JSON.stringify({ id, title })
         });
@@ -135,7 +136,8 @@ export async function DELETE(req: Request) {
         const request = await fetch(`${API_URL}/chats/chat?id=${id}`, {
             method: "DELETE",
             headers: {
-                "x-nexodus-token": `Nexodus ${token.value}`
+                "x-nexodus-token": `Nexodus ${token.value}`,
+                "x-nexodus-proxy": encodeToBase64(PROXY_TOKEN)
             }
         })
 

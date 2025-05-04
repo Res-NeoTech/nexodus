@@ -434,7 +434,7 @@ function Home() {
           })
 
           if (updateChatNameRequest.status === 200) {
-            setCurrentChatName(data.chatName); // Set the chat name only if it's successfully saved, to make sure there is no incoherence.
+            setCurrentChatName(data.chatName); // Set the chat name only if it's successfully saved, to ensure consistency.
           }
         }
       }
@@ -477,7 +477,7 @@ function Home() {
             });
 
             if (updateChatNameRequest.status === 200) {
-              setCurrentChatName(data.chatName);
+              setCurrentChatName(data.chatName); // Set the chat name only if it's successfully saved, to ensure consistency.
             }
           }
         }

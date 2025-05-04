@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { encodeToBase64 } from "@/app/utils/cryptography";
 
+const PROXY_TOKEN: string | undefined = process.env.PROXY_TOKEN;
 const API_URL: string = process.env.NODE_ENV === "production" ? "https://nexapi.maksym.ch" : "http://localhost:5125";
 
 if(process.env.NODE_ENV !== "production") {
@@ -19,7 +21,8 @@ export async function GET() {
         const request = await fetch(`${API_URL}/crud/user`, {
             method: "GET",
             headers: {
-                "x-nexodus-token": `Nexodus ${token.value}`
+                "x-nexodus-token": `Nexodus ${token.value}`,
+                "x-nexodus-proxy": encodeToBase64(PROXY_TOKEN)
             }
         })
 
@@ -53,6 +56,7 @@ export async function POST(req: Request) {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              "x-nexodus-proxy": encodeToBase64(PROXY_TOKEN)
             },
             body: JSON.stringify({ name, email, password }),
           });
