@@ -186,7 +186,7 @@ header {
     display: flex;
     flex-direction: column;
     background-color: $promptBox;
-    height: 150px;
+    height: auto;
     position: sticky;
     margin-top: 100px;
     bottom: 50px;
@@ -194,9 +194,24 @@ header {
 
     textarea {
         width: 100%;
-        height: 75%;
+        height: auto;
         resize: none;
+        max-height: 300px;
         padding: 10px;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        &::-webkit-scrollbar-track {
+            background: rgb(36, 36, 36);
+            border-radius: 10px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+            background: #21A698;
+            border-radius: 10px;
+        }
 
         &:focus {
             outline: none;
@@ -212,7 +227,6 @@ header {
         justify-content: right;
         display: flex;
         margin: 10px;
-        margin-bottom: 20px;
 
         img {
             margin-left: auto;

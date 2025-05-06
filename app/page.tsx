@@ -115,6 +115,17 @@ function Home() {
     preferBottomRef.current = preferBottom;
   }, [preferBottom]);
 
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.addEventListener('input', () => {
+        if (textareaRef.current) {
+          textareaRef.current.style.height = 'auto';
+          textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+        }
+      });
+    }
+  }, [textareaRef.current])
+
   const setChatIdParam = (chatId: string) => {
     router.push(`/?chatId=${chatId}`); //pushing chatId to url
   };
@@ -164,6 +175,10 @@ function Home() {
     if (prompt && !isCurrentlyGenerating) {
       if (prompt.startsWith("!!SEARCH!!")) {
         prompt = prompt.substring("!!SEARCH!!".length).trim()
+
+        if (prompt === "") {
+          return;
+        }
       }
 
       if (isFirstMessage) {
@@ -232,13 +247,7 @@ function Home() {
    * @returns a promise, this returned promise is nowhere used.
    */
   const callMistralAPI = async (prompt: string): Promise<string | null> => {
-    const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
-    const API_URL: string = "https://api.mistral.ai/v1/chat/completions";
-
-    if (!API_KEY) {
-      console.error("API Key is missing");
-      return null;
-    }
+    const API_URL: string = "/api/completion";
 
     setIsCurrentlyGenerating(true);
 
@@ -338,7 +347,6 @@ function Home() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${API_KEY}`
         },
         body: body,
         signal: controller.signal
@@ -513,7 +521,7 @@ function Home() {
         <article className="messageBox">
           <textarea name="promptArea" id="promptArea" onKeyDown={handleKeyDown} placeholder="Type a prompt..." ref={textareaRef}></textarea>
           <div className="promptBoxButtons">
-            <button data-tooltip-id="promptBoxTooltip" data-tooltip-content={"New Chat"} onClick={() => { window.location.href=`${process.env.NEXT_PUBLIC_BASE_URL}` }}>
+            <button data-tooltip-id="promptBoxTooltip" data-tooltip-content={"New Chat"} onClick={() => { window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}` }}>
               <Image src={plusIcon}
                 width={32}
                 height={32}
