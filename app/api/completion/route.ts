@@ -36,7 +36,6 @@ export async function POST(req: Request): Promise<Response> {
         }
 
         const reader = mistralRes.body.getReader();
-        const encoder = new TextEncoder();
 
         const stream = new ReadableStream({
             async start(controller) {

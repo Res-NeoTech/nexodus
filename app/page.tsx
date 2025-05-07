@@ -169,8 +169,6 @@ function Home() {
   };
 
   const sendMessage = async () => {
-    setStopGenerate(false); // Reset stopGenerate to false at the start
-    setMessageCount((prev) => Number(prev) + 1); // Increment messageCount for new animations
     let prompt: string | undefined = textareaRef.current?.value.trim();
     if (prompt && !isCurrentlyGenerating) {
       if (prompt.startsWith("!!SEARCH!!")) {
@@ -180,6 +178,9 @@ function Home() {
           return;
         }
       }
+
+      setStopGenerate(false); // Reset stopGenerate to false at the start
+      setMessageCount((prev) => Number(prev) + 1); // Increment messageCount for new animations
 
       if (isFirstMessage) {
         setIsFirstMessage(false);
@@ -196,6 +197,8 @@ function Home() {
 
       if (textareaRef.current) {
         textareaRef.current.value = "";
+        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
       }
       const userMessageElement = document.createElement('section');
       userMessageElement.className = 'userMessage';
