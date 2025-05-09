@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { encodeToBase64 } from "@/app/utils/cryptography";
+
+const PROXY_TOKEN: string | undefined = process.env.PROXY_TOKEN;
 
 /**
  * Brave Search - GET Endpoint
@@ -31,7 +34,8 @@ export async function GET(req: Request) {
       const request = await fetch(`https://nexapi.maksym.ch/crud/user`, {
         method: "GET",
         headers: {
-          "x-nexodus-token": `Nexodus ${token.value}`
+          "x-nexodus-token": `Nexodus ${token.value}`,
+          "x-nexodus-proxy": encodeToBase64(PROXY_TOKEN)
         }
       })
 

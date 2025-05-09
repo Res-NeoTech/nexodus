@@ -38,7 +38,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, chatName, chatId }) => {
     }, []);
 
     useEffect(() => {
-        document.title = `${currentChatName} | Nexodus`;
+        document.title = `${decodeHtmlEntities(currentChatName)} | Nexodus`;
     }, [currentChatName]);
 
     useEffect(() => {
@@ -80,6 +80,12 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, chatName, chatId }) => {
             event.preventDefault();
             chatNameInputRef.current?.blur();
         }
+    };
+
+    const decodeHtmlEntities = (str: string): string => {
+        const txt = document.createElement("textarea");
+        txt.innerHTML = str;
+        return txt.value;
     };
 
     if (!isLoggedIn) {
@@ -143,7 +149,7 @@ const Header: React.FC<HeaderProps> = ({ isLoggedIn, chatName, chatId }) => {
                 </div>
                 {chatId !== "NONE" ? <input
                     type="text"
-                    value={currentChatName}
+                    value={decodeHtmlEntities(currentChatName)}
                     ref={chatNameInputRef}
                     maxLength={50}
                     onChange={(e) => setCurrentChatName(e.target.value)}

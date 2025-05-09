@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { encodeToBase64 } from "@/app/utils/cryptography";
 
+const PROXY_TOKEN: string | undefined = process.env.PROXY_TOKEN;
 const API_URL: string = process.env.NODE_ENV === "production" ? "https://nexapi.maksym.ch" : "http://localhost:5125";
 
 if(process.env.NODE_ENV !== "production") {
@@ -19,7 +21,10 @@ export async function POST(req: Request) {
 
         const request = await fetch(`${API_URL}/crud/auth`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "x-nexodus-proxy": encodeToBase64(PROXY_TOKEN)
+            },
             body: JSON.stringify({ email, password }),
         });
 
@@ -46,7 +51,6 @@ export async function POST(req: Request) {
         });
 
         return NextResponse.json({ result }, { status: 200 });
-
     } catch (error) {
         console.error("Proxy error:", error);
         return NextResponse.json({ error: "Internal server error", details: String(error) }, { status: 500 });
