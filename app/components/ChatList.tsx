@@ -27,7 +27,13 @@ function ChatList() {
         fetchChats();
     }, []);
 
-    const itemNames = apiItems.map((item) => item.title);
+    const decodeHtmlEntities = (str: string): string => {
+        const txt = document.createElement("textarea");
+        txt.innerHTML = str;
+        return txt.value;
+    };
+
+    const itemNames = apiItems.map((item) => decodeHtmlEntities(item.title));
 
     return (
         <section

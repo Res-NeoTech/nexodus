@@ -213,6 +213,11 @@ function Home() {
         duration: 1000,
         easing: "easeOutExpo"
       });
+
+      if(preferBottomRef.current === true) {
+        window.scrollTo({ top: document.documentElement.scrollHeight });
+      }
+
       setIsCurrentlyGenerating(true);
       callMistralAPI(prompt)
     }
@@ -339,7 +344,6 @@ function Home() {
       // Step 5: Call Mistral AI API
       const body = JSON.stringify({
         model: "mistral-small-latest",
-        stream: true,
         messages: updatedMessages,
       });
 
@@ -401,6 +405,10 @@ function Home() {
 
         const chunk = decoder.decode(value, { stream: true });
         const lines = chunk.split("\n").filter(line => line.trim() !== "");
+
+        if(preferBottomRef.current === true) {
+          window.scrollTo({ top: document.documentElement.scrollHeight });
+        }
 
         for (const line of lines) {
           if (line.trim() === "[DONE]") {
