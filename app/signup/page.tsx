@@ -108,6 +108,7 @@ function SignUp() {
                 width={300}
                 height={300}
                 draggable={false}
+                className="authPageLogo"
                 alt="Logo of Nexodus" />
                 <h1 className="heading">Sign up</h1>
             <section className="signSection">

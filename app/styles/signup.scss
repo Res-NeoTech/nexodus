@@ -1,121 +1,188 @@
+// Simplified color variables
 $promptBox: #131313;
 $hacker-blue-4: #147373;
 $hacker-blue-5: #21A698;
+$hacker-dark: #0c0c0c;
+$error-red: #ff3860;
+$text-color: #e0e0e0;
 
-img{
+body {
+  background-color: $hacker-dark;
+}
+
+// Global styles
+.authPageLogo {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  max-width: 60%;
+}
+
+.heading {
+  text-align: center;
+  margin-bottom: 60px;
+  font-weight: 500;
+  color: $text-color;
+}
+
+.signSection {
+  display: flex;
+  justify-content: space-evenly;
+  margin-bottom: 100px;
+}
+
+.leftContent {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  border-right: $hacker-blue-5 1px solid;
+  justify-content: space-evenly;
+  padding-right: 30px;
+
+  h4, div {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  h4 {
+    color: $hacker-blue-5;
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+  }
+
+  .benefits {
+    font-size: larger;
+  }
+}
+
+.rightContent {
+  width: 50%;
+  padding-left: 30px;
+
+  form {
     margin-left: auto;
     margin-right: auto;
-}
-
-.signSection{
-    display: flex;
-    justify-content: space-evenly;
-    margin-bottom: 100px;
-}
-
-.heading{
-    text-align: center;
-    margin-bottom: 100px;
-}
-
-.leftContent{
+    border-radius: 10px;
+    width: 80%;
+    padding: 20px;
+    background-color: $promptBox;
     display: flex;
     flex-direction: column;
-    width: 50%;
-    border-right: $hacker-blue-5 1px solid;
-    justify-content: space-evenly;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 
-    h4, div{
-        margin-top: 10px;
-        margin-bottom: 10px;
-        text-align: center;
+    input, label {
+      margin: 2.5%;
+      width: 95%;
     }
 
-    .benefits{
-        font-size: larger;
+    label {
+      margin-bottom: 0;
+      font-size: 0.9rem;
+      color: $text-color;
     }
+
+    input {
+      background-color: $hacker-dark;
+      padding: 10px 12px;
+      height: 40px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: $text-color;
+      transition: border 0.3s ease;
+
+      &:focus {
+        outline: 3px solid $hacker-blue-4;
+        border-color: transparent;
+      }
+      
+      &::placeholder {
+        color: rgba(224, 224, 224, 0.4);
+      }
+    }
+
+    .passwordExigence {
+      width: 95%;
+      text-align: center;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+
+    .error {
+      width: 95%;
+      color: $error-red;
+      font-size: 0.85rem;
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+
+    button {
+      margin-top: 15px;
+      width: 50%;
+      transition: 0.3s all;
+
+      &:hover {
+        transition: 0.3s all;
+        width: 95%;
+      }
+
+      &:active {
+        transition: 0.3s all;
+        transform: scale(0.95);
+      }
+    }
+  }
 }
 
-.rightContent{
-    width: 50%;
-
-    form{
-        margin-left: auto;
-        margin-right: auto;
-        border-radius: 10px;
-        width: 50%;
-        padding: 2.5%;
-        background-color: $promptBox;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        box-shadow: rgba(167, 167, 167, 0.1) 0px 0px 20px 0px;
-
-        input, label{
-            margin: 2.5%;
-            width: 95%;
-        }
-
-        label{
-            margin-bottom: 0;
-        }
-
-        input{
-            background-color: #0c0c0c;
-            padding: 5px;
-            height: 40px;
-            border-radius: 10px;
-
-            &:focus {
-                outline: 3px solid $hacker-blue-4;
-            }
-        }
-
-        .passwordExigence{
-            width: 95%;
-            text-align: center;
-        }
-
-        .error{
-            width: 95%;
-            color: crimson;
-        }
-
-        button{
-            margin-top: 15px;
-            width: 50%;
-            transition: 0.3s all;
-
-            &:hover{
-                transition: 0.3s all;
-                width: 95%;
-            }
-
-            &:active{
-                transition: 0.3s all;
-                transform: scale(0.95);
-            }
-        }
-    }
+// Responsive design improvements
+@media (max-width: 1200px) {
+  .rightContent form {
+    width: 90%;
+  }
 }
 
 @media (max-width: 992px) {
-    .signSection{
-        flex-direction: column;
-        align-items: center;
-    }
+  .signSection {
+    flex-direction: column;
+    align-items: center;
+  }
 
-    .rightContent{
-        width: 100%;
+  .rightContent {
+    width: 100%;
+    padding-left: 0;
 
-        form{
-            width: 75%;
-        }
+    form {
+      width: 75%;
     }
+  }
 
-    .leftContent{
-        width: 90%;
-        border: none;
-        margin-bottom: 100px;
-    }
+  .leftContent {
+    width: 90%;
+    border: none;
+    margin-bottom: 60px;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .rightContent form {
+    width: 85%;
+  }
+  
+  .heading {
+    margin-bottom: 40px;
+  }
+}
+
+@media (max-width: 576px) {
+  .rightContent form {
+    width: 95%;
+    padding: 15px;
+  }
+  
+  .leftContent {
+    width: 95%;
+  }
 }

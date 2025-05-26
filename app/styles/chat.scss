@@ -1,7 +1,9 @@
-/* Color Theme Swatches in Hex */
+/* Simplified color variables */
 $promptBox: #131313;
 $hacker-blue-4: #147373;
 $hacker-blue-5: #21A698;
+$hacker-dark: #0c0c0c;
+$text-color: #e0e0e0;
 
 main {
     display: flex;
@@ -100,6 +102,7 @@ header {
     margin-top: 25px;
     opacity: 0;
     transform: translateY(-50%);
+    word-wrap: break-word;
 
     h1,
     h2 {
@@ -112,11 +115,11 @@ header {
     }
 
     div {
-        background-color: rgba(0, 0, 0, 0.548);
-        border: 1px solid $promptBox;
-        padding: 15px;
+        background-color: rgba(19, 19, 19, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 20px;
         border-radius: 10px;
-        box-shadow: rgba(167, 167, 167, 0.1) 0px 0px 20px 0px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         backdrop-filter: blur(10px);
 
         pre {
@@ -130,7 +133,7 @@ header {
 
         section {
             overflow-x: scroll;
-            background-color: $promptBox !important;
+            background-color: #222222 !important;
 
             &::-webkit-scrollbar {
                 width: 8px;
@@ -151,16 +154,62 @@ header {
 
         hr {
             margin: 50px 0;
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         p strong {
             color: $hacker-blue-4;
-            font-weight: 700;
-            font-size: 1.2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
         }
     }
+}
 
-    word-wrap: break-word;
+#codeInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(29, 29, 29, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: none;
+    padding: 8px 15px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    margin-bottom: 0;
+
+    h4 {
+        margin: 0;
+        color: $hacker-blue-5;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    button {
+        background-color: rgba(33, 166, 152, 0.1);
+        border: 1px solid rgba(33, 166, 152, 0.3);
+        color: $hacker-blue-5;
+        padding: 4px 10px;
+        border-radius: 5px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+
+        &:hover {
+            background-color: rgba(33, 166, 152, 0.2);
+            border-color: rgba(33, 166, 152, 0.5);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(33, 166, 152, 0.2);
+        }
+
+        &:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px rgba(33, 166, 152, 0.3);
+        }
+    }
 }
 
 .greeting {
@@ -177,6 +226,9 @@ header {
     h5 {
         text-align: center;
         color: $hacker-blue-5;
+        font-size: 1.1rem;
+        font-weight: 400;
+        margin-top: 20px;
     }
 }
 
@@ -190,14 +242,20 @@ header {
     position: sticky;
     margin-top: 100px;
     bottom: 50px;
-    box-shadow: rgba(167, 167, 167, 0.1) 0px 0px 20px 0px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 
     textarea {
         width: 100%;
         height: auto;
         resize: none;
         max-height: 300px;
-        padding: 10px;
+        padding: 15px;
+        background-color: transparent;
+        border: none;
+        color: $text-color;
+        font-family: inherit;
+        font-size: 1rem;
 
         &::-webkit-scrollbar {
             width: 8px;
@@ -218,15 +276,16 @@ header {
         }
 
         &::placeholder {
-            color: $hacker-blue-4;
+            color: rgba(20, 115, 115, 0.7);
         }
     }
 
     .promptBoxButtons {
-        height: 25%;
+        height: auto;
         justify-content: right;
         display: flex;
         margin: 10px;
+        padding: 5px 0;
 
         img {
             margin-left: auto;
@@ -236,26 +295,37 @@ header {
         button {
             width: 48px;
             height: 48px;
-            background-color: #1d1d1d;
-            border-radius: 10px;
-            transition: all 0.3s;
+            background-color: rgba(29, 29, 29, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s ease;
             margin-left: 10px;
 
             &:hover {
                 cursor: pointer;
+                background-color: rgba(45, 45, 45, 0.9);
+                border-color: rgba(33, 166, 152, 0.3);
+            }
+
+            &:active {
+                transform: scale(0.95);
             }
         }
 
         .active {
-            background-color: white;
+            background-color: rgba(45, 45, 45, 0.9);
+            border-color: rgba(33, 166, 152, 0.3);
         }
     }
 }
 
 @media (min-width: 993px) and (max-width: 1200px) {
-
     #chat,
     .messageBox {
+        width: 75%;
+    }
+
+    .greeting {
         width: 75%;
     }
 }
@@ -265,11 +335,15 @@ header {
         width: 95%;
     }
 
+    .greeting {
+        width: 95%;
+    }
+
     .leftHeaderDiv {
         flex-direction: column;
         justify-content: center;
 
-        button{
+        button {
             width: 100px;
             margin: 0 !important;
         }
@@ -285,6 +359,55 @@ header {
         button {
             width: 20%;
             border-bottom-right-radius: 0;
+        }
+    }
+
+    #codeInfo {
+        padding: 6px 12px;
+        
+        h4 {
+            font-size: 0.8rem;
+        }
+        
+        button {
+            padding: 3px 8px;
+            font-size: 0.7rem;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .greeting {
+        top: 50px;
+        
+        img {
+            width: 300px !important;
+            height: 300px !important;
+        }
+        
+        h5 {
+            font-size: 1rem;
+        }
+    }
+    
+    .messageBox {
+        margin-top: 75px;
+        
+        textarea {
+            padding: 12px;
+        }
+    }
+
+    #codeInfo {
+        padding: 5px 10px;
+        
+        h4 {
+            font-size: 0.75rem;
+        }
+        
+        button {
+            padding: 2px 6px;
+            font-size: 0.65rem;
         }
     }
 }
