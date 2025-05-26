@@ -1,75 +1,169 @@
+// Simplified color variables
 $promptBox: #131313;
 $hacker-blue-4: #147373;
 $hacker-blue-5: #21A698;
+$hacker-dark: #0c0c0c;
+$error-red: #ff3860;
+$text-color: #e0e0e0;
 
-img{
-    margin-left: auto;
-    margin-right: auto;
+// Global styles
+body {
+  background-color: $hacker-dark;
+  color: $text-color;
+  font-family: 'Roboto', sans-serif;
 }
 
-.heading{
-    margin-bottom: 100px;
+.authPageLogo {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  max-width: 60%;
+  margin-top: 30px;
+}
+
+.heading {
+  margin-bottom: 50px;
+  text-align: center;
+  font-weight: 500;
+  color: $text-color;
+
+  h1 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+  }
+  
+  p {
+    font-size: 1rem;
+    opacity: 0.8;
+  }
+}
+
+form {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 60px;
+  border-radius: 10px;
+  width: 30%;
+  padding: 20px;
+  background-color: $promptBox;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  .form-title {
+    width: 100%;
     text-align: center;
+    margin-bottom: 20px;
+    color: $hacker-blue-5;
+    font-size: 1.3rem;
+  }
+
+  input, label {
+    margin: 2.5%;
+    width: 95%;
+  }
+
+  label {
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    color: $text-color;
+  }
+
+  input {
+    background-color: $hacker-dark;
+    padding: 10px 12px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: $text-color;
+    transition: border 0.3s ease;
+
+    &:focus {
+      outline: 3px solid $hacker-blue-4;
+      border-color: transparent;
+    }
+    
+    &::placeholder {
+      color: rgba(224, 224, 224, 0.4);
+    }
+  }
+
+  .error {
+    width: 95%;
+    color: $error-red;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  button {
+    margin-top: 15px;
+    width: 50%;
+    transition: 0.3s all;
+    margin-bottom: 15px;
+
+    &:hover {
+      transition: 0.3s all;
+      width: 95%;
+    }
+
+    &:active {
+      transition: 0.3s all;
+      transform: scale(0.95);
+    }
+  }
+  
+  .form-footer {
+    margin-top: 15px;
+    font-size: 0.85rem;
+    opacity: 0.7;
+    width: 100%;
+    text-align: center;
+    
+    a {
+      color: $hacker-blue-5;
+      text-decoration: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
 }
 
-form{
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 100px;
-    border-radius: 10px;
-    width: 30%;
-    padding: 0.5%;
-    background-color: $promptBox;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-shadow: rgba(167, 167, 167, 0.1) 0px 0px 20px 0px;
-
-    input, label{
-        margin: 2.5%;
-        width: 95%;
-    }
-
-    label{
-        margin-bottom: 0;
-    }
-
-    input{
-        background-color: #0c0c0c;
-        padding: 5px;
-        height: 40px;
-        border-radius: 10px;
-
-        &:focus {
-            outline: 3px solid $hacker-blue-4;
-        }
-    }
-
-    .error{
-        width: 95%;
-        color: crimson;
-    }
-
-    button{
-        margin-top: 15px;
-        width: 50%;
-        transition: 0.3s all;
-        margin-bottom: 15px;
-
-        &:hover{
-            transition: 0.3s all;
-            width: 95%;
-        }
-
-        &:active{
-            transition: 0.3s all;
-            transform: scale(0.95);
-        }
-    }
+// Responsive design improvements
+@media (max-width: 1200px) {
+  form {
+    width: 40%;
+  }
 }
 
 @media (max-width: 992px) {
-    form{
-        width: 90%;
-    }
+  form {
+    width: 60%;
+  }
+}
+
+@media (max-width: 768px) {
+  form {
+    width: 80%;
+    padding: 20px;
+  }
+  
+  .heading h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  form {
+    width: 90%;
+    padding: 15px;
+  }
+  
+  .heading h1 {
+    font-size: 1.8rem;
+  }
 }
